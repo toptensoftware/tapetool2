@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1286F8DF-800B-475D-9FE3-3FD07326C5D4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>tapetool2</RootNamespace>
+    <AssemblyName>tapetool2</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BinaryFiles\FilterBinReader.cs" />
+    <Compile Include="Microbee\FilterByteDecoder.cs" />
+    <Compile Include="Microbee\FilterAudioCycleGenerator.cs" />
+    <Compile Include="Microbee\FilterCycleKindParser.cs" />
+    <Compile Include="Microbee\FilterCycleKindGenerator.cs" />
+    <Compile Include="Microbee\FilterByteEncoder.cs" />
+    <Compile Include="Microbee\FilterTapStreamDecoderAlt.cs" />
+    <Compile Include="Microbee\FilterTapStreamEncoder.cs" />
+    <Compile Include="BinaryFiles\FilterBinWriter.cs" />
+    <Compile Include="Microbee\FilterTapWriter.cs" />
+    <Compile Include="Microbee\FilterTapStreamDecoder.cs" />
+    <Compile Include="Microbee\FilterTapStream.cs" />
+    <Compile Include="Microbee\TapeHeader.cs" />
+    <Compile Include="StreamKinds\FilterSingleBitAudioStream.cs" />
+    <Compile Include="StreamKinds\FilterCycleKindStream.cs" />
+    <Compile Include="TextFiles\FilterTextSingleBitAudioStreamWriter.cs" />
+    <Compile Include="TextFiles\FilterTextBitStreamWriter.cs" />
+    <Compile Include="TextFiles\FilterTextByteStreamWriter.cs" />
+    <Compile Include="TextFiles\FilterTextCycleKindWriter.cs" />
+    <Compile Include="Utils\BitStreamUtils.cs" />
+    <Compile Include="Attributes\StreamKindAttribute.cs" />
+    <Compile Include="Attributes\SourceAttribute.cs" />
+    <Compile Include="Attributes\FilterOptionAttribute.cs" />
+    <Compile Include="Attributes\FileFilterAttribute.cs" />
+    <Compile Include="Attributes\FileReaderAttribute.cs" />
+    <Compile Include="Reflection\FileTypeInfo.cs" />
+    <Compile Include="Reflection\FilterAttribute.cs" />
+    <Compile Include="Attributes\FileWriterAttribute.cs" />
+    <Compile Include="Reflection\FilterInfo.cs" />
+    <Compile Include="Microbee\FilterTapReader.cs" />
+    <Compile Include="StreamKinds\FilterByteStream.cs" />
+    <Compile Include="SingleBitAudio\FilterSingleBitAudioToAudio.cs" />
+    <Compile Include="StreamKinds\Filter.cs" />
+    <Compile Include="Audio\FilterAudioBiasAdjust.cs" />
+    <Compile Include="Audio\FilterAudioGain.cs" />
+    <Compile Include="StreamKinds\FilterBitStream.cs" />
+    <Compile Include="SingleBitAudio\FilterAudioToSingleBitAudio.cs" />
+    <Compile Include="Audio\FilterAudioSelectChannel.cs" />
+    <Compile Include="Audio\FilterAudioChannelMultiCast.cs" />
+    <Compile Include="Audio\FilterAudioMono.cs" />
+    <Compile Include="StreamKinds\FilterAudio.cs" />
+    <Compile Include="Audio\FilterAudioFir.cs" />
+    <Compile Include="Audio\FilterAudioResample.cs" />
+    <Compile Include="SingleBitAudio\FilterSingleBitAudioWriter.cs" />
+    <Compile Include="SingleBitAudio\FilterSingleBitAudioReader.cs" />
+    <Compile Include="Audio\FilterWaveWriter.cs" />
+    <Compile Include="Audio\FilterWaveReader.cs" />
+    <Compile Include="Dsp\FirFilter.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Dsp\Resampler.cs" />
+    <Compile Include="Audio\WaveUtils.cs" />
+    <Compile Include="Utils\CommandLine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

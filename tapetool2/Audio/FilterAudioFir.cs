@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace tapetool2
+{
+    [Filter("fir", "Applies a low-pass, high-pass or band-pass filter to an audio stream")]
+    class FilterAudioFir : FilterAudio
+    {
+        public FilterAudioFir()
+        {
+        }
+
+        FilterAudio _source;
+        [Source]
+        public FilterAudio Source
+        {
+            get { return _source; }
+            set { _source = value; }
+        }
+
+        int _freqLow = 0;
+        int _freqHigh = 0;
+        int _tapCount = 51;
+        int _tailSamples;
+
+        class ChannelStream
+        {
+            public ChannelStream(FirFilter fir)
+            {
+                _fir = fir;
+            }
+
+            public void Process(double sampleIn)
+            {
+                CurrentSample = _fir.ProcessSample(sampleIn);
+            }
+
+            public FirFilter _fir;
+            public double CurrentSample;
+
+        }
+
+        List<ChannelStream> _channelStreams = new List<ChannelStream>();
+
+        public override void Rewind()
+        {
+            base.Rewind();
+
+            // Create channel stream
+            for (int i = 0; i < ChannelCount; i++)
+            {
+                var fir = new FirFilter(51, _source.SampleRate, _freqLow, _freqHigh);
+                _channelStreams.Add(new ChannelStream(fir));
+            }
+
+            // Number of tail samples to be processed before eof
+            _tailSamples = _tapCount/2;
+
+            // Preload the taps
+            for (int i=0; i< _tapCount/2; i++)
+            {
+                ProcessSample();
+            }
+        }
+
+        [FilterOption("low", "Low cutoff frequency")]
+        public int Low
+        {
+            get { return _freqLow; }
+            set { _freqLow = value; }
+        }
+
+        [FilterOption("high", "High cutoff frequency")]
+        public int High
+        {
+            get { return _freqHigh; }
+            set { _freqHigh = value; }
+        }
+
+        [FilterOption("taps", "Number of taps in FIR filter")]
+        public int Taps
+        {
+            get { return _tapCount; }
+            set { _tapCount = value; }
+        }
+
+        public override IEnumerable<Filter> GetPrecedents()
+        {
+            yield return _source;
+        }
+
+        public override int ChannelCount
+        {
+            get
+            {
+                return _source.ChannelCount;
+            }
+        }
+
+        public override int BitsPerSample
+        {
+            get
+            {
+                return _source.BitsPerSample;
+            }
+        }
+
+        public override int SampleRate
+        {
+            get
+            {
+                return _source.SampleRate;
+            }
+        }
+
+        public override float GetSample(int channel)
+        {
+            return (float)_channelStreams[channel].CurrentSample;
+        }
+
+        public override bool Next()
+        {
+            if (_tailSamples == 0)
+                return false;
+
+            ProcessSample();
+            return true;
+        }
+
+        void ProcessSample()
+        {
+            if (_source.Next())
+            {
+                // Pump next sample from the source
+                for (int i = 0; i < _channelStreams.Count; i++)
+                {
+                    _channelStreams[i].Process(_source.GetSample(i));
+                }
+            }
+            else
+            {
+                // In tail - pump zeros
+                for (int i = 0; i < _channelStreams.Count; i++)
+                {
+                    _channelStreams[i].Process(0);
+                }
+                _tailSamples--;
+            }
+        }
+
+    }
+}

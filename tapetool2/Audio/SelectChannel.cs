@@ -14,14 +14,14 @@ namespace tapetool2.Audio
             _channel = 0;
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
         int _channel;
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
 
@@ -40,27 +40,27 @@ namespace tapetool2.Audio
 
         public int SampleRate
         {
-            get { return _source.SampleRate; }
+            get { return _input.SampleRate; }
         }
 
         public float GetSample(int channel)
         {
-            return _source.GetSample(_channel);
+            return _input.GetSample(_channel);
         }
 
         public override bool Next()
         {
-            return _source.Next();
+            return _input.Next();
         }
 
         public int BitsPerSample
         {
-            get { return _source.BitsPerSample; }
+            get { return _input.BitsPerSample; }
         }
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
     }
 }

@@ -14,13 +14,13 @@ namespace tapetool2.Audio
         {
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         [FilterOption("filename", "The file to write", IsFileName = true)]
@@ -61,10 +61,10 @@ namespace tapetool2.Audio
             _binaryWriter.Write((uint)(WaveUtils.ChunkIdFmt));
             _binaryWriter.Write((uint)(16));
             _binaryWriter.Write((ushort)(WaveUtils.Format.PCM));
-            _binaryWriter.Write((ushort)(_source.ChannelCount));
-            _binaryWriter.Write((uint)(_source.SampleRate));
-            _binaryWriter.Write((uint)(_source.ChannelCount * bytesPerSample * _source.SampleRate));     // Avg bytes per second
-            _binaryWriter.Write((ushort)(_source.ChannelCount * bytesPerSample));                          // Block align
+            _binaryWriter.Write((ushort)(_input.ChannelCount));
+            _binaryWriter.Write((uint)(_input.SampleRate));
+            _binaryWriter.Write((uint)(_input.ChannelCount * bytesPerSample * _input.SampleRate));     // Avg bytes per second
+            _binaryWriter.Write((ushort)(_input.ChannelCount * bytesPerSample));                          // Block align
             _binaryWriter.Write((ushort)(bytesPerSample * 8));
 
             // Data chunk
@@ -97,7 +97,7 @@ namespace tapetool2.Audio
             // Open output stream
             _stream = File.Create(Filename);
             _binaryWriter = new BinaryWriter(_stream, Encoding.UTF8, true);
-            _bitsPerSample = _source.BitsPerSample;
+            _bitsPerSample = _input.BitsPerSample;
 
             if (_bitsPerSample < 8)
                 _bitsPerSample = 8;
@@ -108,14 +108,14 @@ namespace tapetool2.Audio
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public int ChannelCount
         {
             get
             {
-                return _source.ChannelCount;
+                return _input.ChannelCount;
             }
         }
 
@@ -131,21 +131,21 @@ namespace tapetool2.Audio
         {
             get
             {
-                return _source.SampleRate;
+                return _input.SampleRate;
             }
         }
 
         public float GetSample(int channel)
         {
-            return _source.GetSample(channel);
+            return _input.GetSample(channel);
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 return false;
 
-            for (int i = 0; i < _source.ChannelCount; i++)
+            for (int i = 0; i < _input.ChannelCount; i++)
             {
                 float sample = GetSample(i);
                 if (sample < -1)

@@ -43,12 +43,12 @@ namespace tapetool2.Text
             set { _hexPrefix = value; }
         }
 
-        IByteStream _source;
-        [Source]
-        public IByteStream Source
+        IByteStream _input;
+        [InputStream]
+        public IByteStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         TextWriter _tw;
@@ -72,17 +72,17 @@ namespace tapetool2.Text
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return Source;
+            yield return Input;
         }
 
         public byte GetByte()
         {
-            return _source.GetByte();
+            return _input.GetByte();
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
             {
                 if (_position > 0 && _ascii)
                 {
@@ -104,7 +104,7 @@ namespace tapetool2.Text
                 _tw.Write("\n[{0:X8}] ", _position);
             }
 
-            var b = _source.GetByte();
+            var b = _input.GetByte();
 
             if (_hexPrefix)
                 _tw.Write(" 0x{0:X2}", b);

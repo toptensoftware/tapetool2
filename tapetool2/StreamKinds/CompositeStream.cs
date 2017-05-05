@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace tapetool2
 {
@@ -9,12 +10,17 @@ namespace tapetool2
         {
         }
 
+        public virtual void SetInput(IStream input)
+        {
+            First.SetInput(input);
+        }
+
         public void Add(IStream stream)
         {
             // Connect chain
             if (_chain.Count > 0)
             {
-                stream.SetSource(_chain[_chain.Count - 1]);
+                stream.SetInput(_chain[_chain.Count - 1]);
             }
 
             // Add to list
@@ -43,11 +49,6 @@ namespace tapetool2
             return Last.Next();
         }
 
-        public virtual IStream ConvertTo(Type filterType)
-        {
-            return Last.ConvertTo(filterType);
-        }
-
         public virtual IStream UpstreamOfType(Type filterType)
         {
             return Last.UpstreamOfType(filterType);
@@ -61,6 +62,11 @@ namespace tapetool2
                     return true;
             }
             return false;
+        }
+
+        public IEnumerable<FilterOptionAttribute> GetOptions()
+        {
+            return _chain.SelectMany(x => x.GetOptions());
         }
 
         public virtual void Dispose()

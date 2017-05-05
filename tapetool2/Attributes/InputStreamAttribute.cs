@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace tapetool2
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class SourceAttribute : Attribute
+    public class InputStreamAttribute : Attribute
     {
-        public SourceAttribute()
+        public InputStreamAttribute()
         {
         }
     }

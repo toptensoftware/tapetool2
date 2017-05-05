@@ -22,12 +22,12 @@ namespace tapetool2.Text
             set;
         }
 
-        IBitStream _source;
-        [Source]
-        public IBitStream Source
+        IBitStream _input;
+        [InputStream]
+        public IBitStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         TextWriter _tw;
@@ -64,17 +64,17 @@ namespace tapetool2.Text
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return Source;
+            yield return Input;
         }
 
         public bool GetSample()
         {
-            return _source.GetSample();
+            return _input.GetSample();
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
             {
                 _tw.WriteLine("\n\n[EOF]");
                 return false;
@@ -92,7 +92,7 @@ namespace tapetool2.Text
                 _tw.Write("\n[{0:X8}] ", _position);
             }
 
-            var b = _source.GetSample();
+            var b = _input.GetSample();
 
             _tw.Write(b ? '1' : '0');
 

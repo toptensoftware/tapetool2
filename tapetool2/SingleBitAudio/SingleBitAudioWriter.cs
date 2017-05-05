@@ -13,16 +13,16 @@ namespace tapetool2.SingleBitAudio
         public SingleBitAudioWriter(string filename, IAudioStream source)
         {
             Filename = filename;
-            _source = source;
+            _input = source;
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         public string Filename
@@ -68,14 +68,14 @@ namespace tapetool2.SingleBitAudio
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public int SampleRate
         {
             get
             {
-                return _source.SampleRate;
+                return _input.SampleRate;
             }
         }
 
@@ -97,12 +97,12 @@ namespace tapetool2.SingleBitAudio
 
         public float GetSample(int channel)
         {
-            return _source.GetSample(channel);
+            return _input.GetSample(channel);
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 return false;
 
             // Write the current bit

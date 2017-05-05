@@ -74,19 +74,13 @@ namespace tapetool2
             Console.WriteLine("{0} - {1}", fi.Name, fi.Description);
 
             // Find the source property
-            var sourceProp = fi.Type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<SourceAttribute>().Any());
+            var sourceProp = fi.Type.GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<InputStreamAttribute>().Any());
             Console.WriteLine("\nInput Kind: {0}", sourceProp == null ? "none" : StreamKind(sourceProp.PropertyType));
             Console.WriteLine("Output Kind: {0}", StreamKind(fi.Type));
 
-
             bool firstArg = true;
-            foreach (var p in fi.Type.GetProperties())
+            foreach (var attr in stream.GetOptions())
             {
-                // Get command arguments
-                var attr = p.GetCustomAttributes(true).OfType<FilterOptionAttribute>().FirstOrDefault();
-                if (attr == null)
-                    continue;
-
                 if (firstArg)
                 {
                     Console.WriteLine("\nOptions:");
@@ -252,7 +246,7 @@ namespace tapetool2
                     nextStream = (IStream)Activator.CreateInstance(fi.Type);
                 }
 
-                nextStream.SetSource(lhsStream);
+                nextStream.SetInput(lhsStream);
                 lhsStream = nextStream;
                 if (firstStream == null)
                     firstStream = lhsStream;

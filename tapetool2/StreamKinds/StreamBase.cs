@@ -12,6 +12,28 @@ namespace tapetool2
         {
         }
 
+        public virtual void SetInput(IStream input)
+        {
+            // Find the intput property
+            var prop = GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<InputStreamAttribute>().Any());
+
+            if (input != null)
+            {
+                if (prop == null)
+                    throw new InvalidOperationException(string.Format("{0} doesn't have a source property and must be the first in the chain", GetType().Name));
+
+                if (!prop.PropertyType.IsAssignableFrom(input.GetType()))
+                {
+                    var converted = StreamConversion.ConvertStream(input, prop.PropertyType, GetType());
+                    if (converted == null)
+                        throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2})", GetType().Name, input.GetType().Name, prop.PropertyType.Name));
+                    input = converted;
+                }
+
+                // Assign it
+                prop.SetValue(this, input);
+            }
+        }
 
         public virtual IStream ConvertTo(Type filterType)
         {
@@ -60,15 +82,20 @@ namespace tapetool2
 
         public bool SetArgument(string name, string value)
         {
-            // Find the property
-            var prop = GetType().GetProperties().FirstOrDefault(x => string.Compare(x.Name, name, true) == 0);
+            var opts = GetOptions();
+
+            // Find the property using the name supplied in the attributes
+            var prop = GetType().GetProperties().FirstOrDefault( x => {
+                var a = x.GetCustomAttribute<FilterOptionAttribute>();
+                if (a == null)
+                    return false;
+                return string.Compare(a.Name, name, true) == 0;
+            });
             if (prop == null)
                 return false;
 
             // Must have a attribute to assign it
-            var attr = prop.GetCustomAttributes(typeof(FilterOptionAttribute), true).Cast<FilterOptionAttribute>().FirstOrDefault();
-            if (attr == null)
-                return false;
+            var attr = prop.GetCustomAttribute<FilterOptionAttribute>();
 
             // Qualify file names
             if (attr.IsFileName)
@@ -80,6 +107,17 @@ namespace tapetool2
             // Set it
             prop.SetValue(this, typedValue);
             return true;
+        }
+
+        public IEnumerable<FilterOptionAttribute> GetOptions()
+        {
+            foreach (var p in GetType().GetProperties())
+            {
+                // Get command arguments
+                var attr = p.GetCustomAttribute<FilterOptionAttribute>();
+                if (attr != null)
+                    yield return attr;
+            }
         }
 
     }

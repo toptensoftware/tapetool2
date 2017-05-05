@@ -14,13 +14,16 @@ namespace tapetool2
         // Move to the next sample
         bool Next();
 
-        // Convert this stream to another type
-        IStream ConvertTo(Type filterType);
+        // Set the input stream for this stream
+        void SetInput(IStream stream);
 
         // Get an upstream stream of a particular type
         IStream UpstreamOfType(Type filterType);
 
         // Set an argument on the stream
         bool SetArgument(string name, string value);
+
+        // Get all options for this stream/filter
+        IEnumerable<FilterOptionAttribute> GetOptions();
     }
 }

@@ -13,16 +13,16 @@ namespace tapetool2.Microbee
         {
         }
 
-        IBitStream _source;
+        IBitStream _input;
         IBaudRateProvider _sourceBRP;
 
-        [Source]
-        public IBitStream Source
+        [InputStream]
+        public IBitStream Input
         {
-            get { return _source; }
+            get { return _input; }
             set
             {
-                _source = value;
+                _input = value;
                 _sourceBRP = UpstreamOfType<IBaudRateProvider>();
             }
         }
@@ -66,7 +66,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public int GetCurrentBaudRate()
@@ -97,12 +97,12 @@ namespace tapetool2.Microbee
             switch (_state)
             {
                 case State.startBit:
-                    if (!_source.Next())
+                    if (!_input.Next())
                         return false;
 
-                    _cyclesLeft = (_source.GetSample() ? 8 : 4) / (ResolveBaudRate()/ 300) - 1;
+                    _cyclesLeft = (_input.GetSample() ? 8 : 4) / (ResolveBaudRate()/ 300) - 1;
                     _state = _cyclesLeft > 0 ? State.cycles : State.startBit;
-                    _cycleKind = _source.GetSample() ? CycleKind.High : CycleKind.Low;
+                    _cycleKind = _input.GetSample() ? CycleKind.High : CycleKind.Low;
                     break;
 
                 case State.cycles:

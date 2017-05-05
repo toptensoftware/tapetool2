@@ -14,19 +14,19 @@ namespace tapetool2.Microbee
         {
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
         int _samplesPerHighCycle;
         int _samplesPerLowCycle;
         int _sampleMargin;
         int _currentCycleSamples;
     
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
+            get { return _input; }
             set
             {
-                _source = value;
+                _input = value;
             }
         }
 
@@ -35,12 +35,12 @@ namespace tapetool2.Microbee
             base.Rewind();
 
             // Find the first positive sample 
-            while (_source.Next() && _source.GetSample(0) <= 0)
+            while (_input.Next() && _input.GetSample(0) <= 0)
             {
             }
 
-            _samplesPerHighCycle = _source.SampleRate / 2400;
-            _samplesPerLowCycle = _source.SampleRate / 1200;
+            _samplesPerHighCycle = _input.SampleRate / 2400;
+            _samplesPerLowCycle = _input.SampleRate / 1200;
             _sampleMargin = (_samplesPerLowCycle - _samplesPerHighCycle) / 3;
         }
 
@@ -48,14 +48,14 @@ namespace tapetool2.Microbee
         int FindZeroCrossing()
         {
             int samples = -1;
-            float prevSample = _source.GetSample(0);
+            float prevSample = _input.GetSample(0);
 
             while (true)
             {
-                if (!_source.Next())
+                if (!_input.Next())
                     return samples;
 
-                var currentSample = _source.GetSample(0);
+                var currentSample = _input.GetSample(0);
 
                 if (prevSample <= 0 && currentSample > 0)
                     return samples;
@@ -68,7 +68,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         const double highCycleTime = 1.0 / 2400;

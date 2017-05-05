@@ -36,12 +36,12 @@ namespace tapetool2.Text
 
 
 
-        ICycleKindStream _source;
-        [Source]
-        public ICycleKindStream Source
+        ICycleKindStream _input;
+        [InputStream]
+        public ICycleKindStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         TextWriter _tw;
@@ -66,28 +66,28 @@ namespace tapetool2.Text
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return Source;
+            yield return Input;
         }
 
         public CycleKind GetCycleKind()
         {
-            return _source.GetCycleKind();
+            return _input.GetCycleKind();
         }
 
         public int GetCurrentBaudRate()
         {
-            return _source.GetCurrentBaudRate();
+            return _input.GetCurrentBaudRate();
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
             {
                 _tw.WriteLine("\n\n[EOF]");
                 return false;
             }
 
-            var br = _source.GetCurrentBaudRate();
+            var br = _input.GetCurrentBaudRate();
             if (br != _prevBaudRate)
             {
                 _tw.Write("[baud:{0}]", br);
@@ -105,7 +105,7 @@ namespace tapetool2.Text
             }
 
             var ch = '?';
-            switch (_source.GetCycleKind())
+            switch (_input.GetCycleKind())
             {
                 case CycleKind.High:
                     ch = 'S';

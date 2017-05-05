@@ -16,15 +16,15 @@ namespace tapetool2.Microbee
         {
         }
 
-        IByteStream _source;
+        IByteStream _input;
         TapeHeader _header;
         ushort _blockAddress;
 
-        [Source]
-        public IByteStream Source
+        [InputStream]
+        public IByteStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         public override void Rewind()
@@ -33,7 +33,7 @@ namespace tapetool2.Microbee
 
             // Find the header
             CheckedNext();
-            while (_source.GetByte() != 0x01)
+            while (_input.GetByte() != 0x01)
             {
                 CheckedNext();
             }
@@ -44,13 +44,13 @@ namespace tapetool2.Microbee
             for (int i = 0; i < 16; i++)
             {
                 CheckedNext();
-                header[i] = _source.GetByte();
+                header[i] = _input.GetByte();
                 checksum += header[i];
             }
 
             // Read the checksum
             CheckedNext();
-            checksum += _source.GetByte();
+            checksum += _input.GetByte();
             if (checksum != 0)
                 throw new InvalidDataException(string.Format("Check sum error on tap header (0x{0:x2})", checksum));
 
@@ -96,12 +96,12 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public void CheckedNext()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
@@ -122,7 +122,7 @@ namespace tapetool2.Microbee
             for (int i = 0; i < bytesInBlock; i++)
             {
                 CheckedNext();
-                data[i] = _source.GetByte();
+                data[i] = _input.GetByte();
                 checksum += data[i];
             }
 
@@ -133,7 +133,7 @@ namespace tapetool2.Microbee
             var block = new Block();
             block.Address = _blockAddress;
             block.Data = data;
-            block.Checksum = _source.GetByte();
+            block.Checksum = _input.GetByte();
 
             // Check the checksum
             if ((byte)(checksum + block.Checksum) != 0)

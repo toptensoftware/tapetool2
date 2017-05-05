@@ -21,12 +21,12 @@ namespace tapetool2.Binary
             set;
         }
 
-        IByteStream _source;
-        [Source]
-        public IByteStream Source
+        IByteStream _input;
+        [InputStream]
+        public IByteStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         FileStream _stream;
@@ -45,19 +45,19 @@ namespace tapetool2.Binary
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return Source;
+            yield return Input;
         }
 
         public byte GetByte()
         {
-            return _source.GetByte();
+            return _input.GetByte();
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 return false;
-            _stream.WriteByte(_source.GetByte());
+            _stream.WriteByte(_input.GetByte());
             return true;
         }
 

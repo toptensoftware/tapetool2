@@ -37,12 +37,12 @@ namespace tapetool2.Microbee
             set { _hexPrefix = value; }
         }
 
-        IBlockStream _source;
-        [Source]
-        public IBlockStream Source
+        IBlockStream _input;
+        [InputStream]
+        public IBlockStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         TextWriter _tw;
@@ -62,15 +62,15 @@ namespace tapetool2.Microbee
             // Write the header
             _tw.WriteLine("\n[header]");
             _tw.WriteLine("[");
-            _tw.WriteLine("    {0,15}: '{1}'", "filename", _source.Header.filename);
-            _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "datalen", _source.Header.datalen, _source.Header.datalen);
-            _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "start address", _source.Header.startaddr, _source.Header.startaddr);
-            _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "speed", _source.Header.speed, _source.Header.speed);
-            _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "autostart", _source.Header.autostart, _source.Header.autostart);
+            _tw.WriteLine("    {0,15}: '{1}'", "filename", _input.Header.filename);
+            _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "datalen", _input.Header.datalen, _input.Header.datalen);
+            _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "start address", _input.Header.startaddr, _input.Header.startaddr);
+            _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "speed", _input.Header.speed, _input.Header.speed);
+            _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "autostart", _input.Header.autostart, _input.Header.autostart);
             _tw.WriteLine("]");
 
             _tw.Write("[bytes]     ");
-            var headerBytes = _source.Header.ToBytes();
+            var headerBytes = _input.Header.ToBytes();
             for (int i=0; i<headerBytes.Length; i++)
             {
                 var b = headerBytes[i];
@@ -78,28 +78,28 @@ namespace tapetool2.Microbee
             }
 
             _tw.WriteLine();
-            _tw.WriteLine("[Checksum]  {0}", FormatByte(_source.Header.Checksum));
+            _tw.WriteLine("[Checksum]  {0}", FormatByte(_input.Header.Checksum));
 
         }
 
     public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return Source;
+            yield return Input;
         }
 
         public TapeHeader Header
         {
-            get { return _source.Header; }
+            get { return _input.Header; }
         }
 
         public Block GetBlock()
         {
-            return _source.GetBlock();
+            return _input.GetBlock();
         }
 
         public override bool Next()
         {
-            if (!_source.Next())
+            if (!_input.Next())
             {
                 _tw.WriteLine("\n\n[EOF]");
                 return false;

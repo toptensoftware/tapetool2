@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbee.renderAudio", "Parses a Microbee block stream into audio stream")]
+    [Filter("microbee.renderAudio", "Parses a Microbee block stream into an audio stream")]
     class RenderAudio : CompositeStream, IAudioStream
     {
         public RenderAudio()
@@ -21,12 +21,12 @@ namespace tapetool2.Microbee
         IAudioStream _last;
 
 
-        [Source]
-        public IBlockStream Source
+        [InputStream]
+        public IBlockStream Input
         {
             set
             {
-                ((SetHeader)First).Source = value;
+                ((SetHeader)First).Input = value;
             }
         }
 

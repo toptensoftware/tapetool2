@@ -16,13 +16,13 @@ namespace tapetool2.Microbee
         {
         }
 
-        IBlockStream _source;
+        IBlockStream _input;
 
-        [Source]
-        public IBlockStream Source
+        [InputStream]
+        public IBlockStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
 
@@ -84,7 +84,7 @@ namespace tapetool2.Microbee
 
 
             // Start with the source header
-            _header = _source.Header;
+            _header = _input.Header;
 
             // Apply changes
             if (_filename != null)
@@ -116,17 +116,17 @@ namespace tapetool2.Microbee
 
         public Block GetBlock()
         {
-            return _source.GetBlock();
+            return _input.GetBlock();
         }
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public override bool Next()
         {
-            return _source.Next();
+            return _input.Next();
         }
 
     }

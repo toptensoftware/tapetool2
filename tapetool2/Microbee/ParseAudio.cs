@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbee.parseAudio", "Parses a Microbee audio stream into tap file stream")]
+    [Filter("microbee.parseAudio", "Parses a Microbee audio stream into block stream")]
     class ParseAudio : CompositeStream, IBlockStream, IBaudRateProvider
     {
         public ParseAudio()
@@ -18,12 +18,12 @@ namespace tapetool2.Microbee
         }
 
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
             set
             {
-                ((AudioToCycleKinds)First).Source = value;
+                ((AudioToCycleKinds)First).Input = value;
             }
         }
 

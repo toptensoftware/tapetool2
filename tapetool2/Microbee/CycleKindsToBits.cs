@@ -15,18 +15,18 @@ namespace tapetool2.Microbee
         {
         }
 
-        ICycleKindStream _source;
+        ICycleKindStream _input;
         IBaudRateProvider _sourceBRP;
 
 
-        [Source]
-        public ICycleKindStream Source
+        [InputStream]
+        public ICycleKindStream Input
         {
-            get { return _source; }
+            get { return _input; }
             set
             {
-                _source = value;
-                _sourceBRP = _source as IBaudRateProvider;
+                _input = value;
+                _sourceBRP = _input as IBaudRateProvider;
             }
         }
 
@@ -75,7 +75,7 @@ namespace tapetool2.Microbee
             {
                 while (_leadCycles.Count < 64)
                 {
-                    if (!_source.Next())
+                    if (!_input.Next())
                     {
                         // Didn't get much but try to sync it anyway
                         while (_leadCycles.Count!=0 && !IsSynced(_leadCycles))
@@ -83,11 +83,11 @@ namespace tapetool2.Microbee
                         return;
                     }
 
-                    switch (_source.GetCycleKind())
+                    switch (_input.GetCycleKind())
                     {
                         case CycleKind.High:
                         case CycleKind.Low:
-                            _leadCycles.Add(_source.GetCycleKind());
+                            _leadCycles.Add(_input.GetCycleKind());
                             break;
 
                         default:
@@ -143,14 +143,14 @@ namespace tapetool2.Microbee
             var leadCycles = new List<CycleKind>();
             while (leadCycles.Count < 64)
             {
-                if (!_source.Next())
+                if (!_input.Next())
                     return leadCycles;
 
-                switch (_source.GetCycleKind())
+                switch (_input.GetCycleKind())
                 {
                     case CycleKind.High:
                     case CycleKind.Low:
-                        leadCycles.Add(_source.GetCycleKind());
+                        leadCycles.Add(_input.GetCycleKind());
                         break;
 
                     default:
@@ -164,7 +164,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public bool GetSample()
@@ -182,12 +182,12 @@ namespace tapetool2.Microbee
             }
             else
             {
-                if (!_source.Next())
+                if (!_input.Next())
                 {
                     cycleKind = CycleKind.Indeterminate;
                     return false;
                 }
-                cycleKind = _source.GetCycleKind();
+                cycleKind = _input.GetCycleKind();
             }
             return true;
         }

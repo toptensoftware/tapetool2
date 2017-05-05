@@ -76,6 +76,7 @@ namespace tapetool2.Microbee
             base.Dispose();
         }
 
+
         /*
         public override Filter ConvertTo(Type filterType)
         {

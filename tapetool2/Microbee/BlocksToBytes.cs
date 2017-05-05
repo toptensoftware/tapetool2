@@ -15,7 +15,7 @@ namespace tapetool2.Microbee
         {
         }
 
-        IBlockStream _source;
+        IBlockStream _input;
         State _state;
         int _stateByteIndex;
         byte[] _headerBytes;
@@ -30,11 +30,11 @@ namespace tapetool2.Microbee
             blockChecksum,
         }
 
-        [Source]
-        public IBlockStream Source
+        [InputStream]
+        public IBlockStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         int IBaudRateProvider.BaudRate
@@ -45,7 +45,7 @@ namespace tapetool2.Microbee
                 {
                     case State.block:
                     case State.blockChecksum:
-                        switch (_source.Header.speed)
+                        switch (_input.Header.speed)
                         {
                             default:
                                 return 300;
@@ -66,7 +66,7 @@ namespace tapetool2.Microbee
             base.Rewind();
 
             // Get the header bytes
-            _headerBytes = _source.Header.ToBytes();
+            _headerBytes = _input.Header.ToBytes();
 
             // Start before beginning of file
             _state = State.bof;
@@ -83,13 +83,13 @@ namespace tapetool2.Microbee
                     return _headerBytes[_stateByteIndex];
 
                 case State.headerChecksum:
-                    return _source.Header.Checksum;
+                    return _input.Header.Checksum;
 
                 case State.block:
-                    return _source.GetBlock().Data[_stateByteIndex];
+                    return _input.GetBlock().Data[_stateByteIndex];
 
                 case State.blockChecksum:
-                    return _source.GetBlock().Checksum;
+                    return _input.GetBlock().Checksum;
             }
 
             throw new InvalidOperationException();
@@ -97,12 +97,12 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public void CheckedNext()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
@@ -134,7 +134,7 @@ namespace tapetool2.Microbee
 
                 case State.headerChecksum:
                 case State.blockChecksum:
-                    if (!_source.Next())
+                    if (!_input.Next())
                         return false;
 
                     _stateByteIndex = 0;
@@ -144,7 +144,7 @@ namespace tapetool2.Microbee
                 case State.block:
                     _stateByteIndex++;
 
-                    if (_stateByteIndex == _source.GetBlock().Data.Length)
+                    if (_stateByteIndex == _input.GetBlock().Data.Length)
                     {
                         _state = State.blockChecksum;
                     }

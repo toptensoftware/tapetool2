@@ -14,16 +14,16 @@ namespace tapetool2.Microbee
         {
         }
 
-        IByteStream _source;
+        IByteStream _input;
         IBaudRateProvider _sourceBRP;
 
-        [Source]
-        public IByteStream Source
+        [InputStream]
+        public IByteStream Input
         {
-            get { return _source; }
+            get { return _input; }
             set
             {
-                _source = value;
+                _input = value;
                 _sourceBRP = UpstreamOfType<IBaudRateProvider>();
             }
         }
@@ -58,7 +58,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public bool GetSample()
@@ -69,7 +69,7 @@ namespace tapetool2.Microbee
                     return false;
 
                 case State.dataBits:
-                    return ((_source.GetByte() >> _bitCounter) & 0x01)!= 0;
+                    return ((_input.GetByte() >> _bitCounter) & 0x01)!= 0;
 
                 case State.tailBit1:
                 case State.tailBit2:
@@ -84,7 +84,7 @@ namespace tapetool2.Microbee
             switch (_state)
             {
                 case State.bof:
-                    if (!_source.Next())
+                    if (!_input.Next())
                         return false;
                     _state = State.leadBit;
                     if (_sourceBRP!=null)
@@ -107,7 +107,7 @@ namespace tapetool2.Microbee
                     break;
 
                 case State.tailBit2:
-                    if (!_source.Next())
+                    if (!_input.Next())
                         return false;
                     if (_sourceBRP != null)
                         _currentBaudRate = _sourceBRP.BaudRate;

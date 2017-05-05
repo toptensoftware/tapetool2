@@ -13,14 +13,14 @@ namespace tapetool2.Audio
         {
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
         float _gain = 0.5f;
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         [FilterOption("factor", "Amount to adjust audio gain by (default=0.5)")]
@@ -32,32 +32,32 @@ namespace tapetool2.Audio
 
         public int ChannelCount
         {
-            get { return _source.ChannelCount; }
+            get { return _input.ChannelCount; }
         }
 
         public int SampleRate
         {
-            get { return _source.SampleRate; }
+            get { return _input.SampleRate; }
         }
 
         public float GetSample(int channel)
         {
-            return _source.GetSample(channel) * _gain;
+            return _input.GetSample(channel) * _gain;
         }
 
         public override bool Next()
         {
-            return _source.Next();
+            return _input.Next();
         }
 
         public int BitsPerSample
         {
-            get { return _source.BitsPerSample; }
+            get { return _input.BitsPerSample; }
         }
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
     }
 }

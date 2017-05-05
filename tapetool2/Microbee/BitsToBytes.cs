@@ -15,17 +15,17 @@ namespace tapetool2.Microbee
         {
         }
 
-        IBitStream _source;
+        IBitStream _input;
         byte _currentByte;
         byte[] _leadBytes;
         int _leadByteCount;
         int _leadBytesSent;
 
-        [Source]
-        public IBitStream Source
+        [InputStream]
+        public IBitStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         public override void Rewind()
@@ -71,10 +71,10 @@ namespace tapetool2.Microbee
         {
             // Read bits until we get a matching 11xxxxxxxx0 pattern
             uint shiftReg = 0;
-            while (_source.Next())
+            while (_input.Next())
             {
                 // Shift in the next bit
-                shiftReg = (uint)((_source.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
+                shiftReg = (uint)((_input.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
                 if ((shiftReg & 0xc000) == 0xc000)
                 {
                     // Return the found byte
@@ -91,11 +91,11 @@ namespace tapetool2.Microbee
             uint shiftReg = 0;
             for (int i=0; i<11; i++)
             {
-                if (!_source.Next())
+                if (!_input.Next())
                     return null;
 
                 // Shift in the next bit
-                shiftReg = (uint)((_source.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
+                shiftReg = (uint)((_input.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
             }
 
             // Valid?
@@ -115,13 +115,13 @@ namespace tapetool2.Microbee
             uint shiftReg = 0;
             for (int i = 0; i < 11; i++)
             {
-                if (!_source.Next())
+                if (!_input.Next())
                 {
                     return null;
                 }
 
                 // Shift in the next bit
-                shiftReg = (uint)((_source.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
+                shiftReg = (uint)((_input.GetSample() ? 0x8000u : 0u) | (shiftReg >> 1));
             }
 
             // Valid?
@@ -136,7 +136,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public byte GetByte()
@@ -166,7 +166,7 @@ namespace tapetool2.Microbee
         void ISetUpstreamBaudRate.SetUpstreamBaudRate(int baudRate)
         {
             // Pass baud rate through to source cycle kind parser
-            var upstream = _source as ISetUpstreamBaudRate;
+            var upstream = _input as ISetUpstreamBaudRate;
             if (upstream != null)
                 upstream.SetUpstreamBaudRate(baudRate);
         }

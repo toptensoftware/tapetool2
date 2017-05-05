@@ -14,12 +14,12 @@ namespace tapetool2.Audio
         {
         }
 
-        IAudioStream _source;
-        [Source]
-        public IAudioStream Source
+        IAudioStream _input;
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         int _freqLow = 0;
@@ -53,7 +53,7 @@ namespace tapetool2.Audio
             // Create channel stream
             for (int i = 0; i < ChannelCount; i++)
             {
-                var fir = new FirFilter(51, _source.SampleRate, _freqLow, _freqHigh);
+                var fir = new FirFilter(51, _input.SampleRate, _freqLow, _freqHigh);
                 _channelStreams.Add(new ChannelStream(fir));
             }
 
@@ -90,14 +90,14 @@ namespace tapetool2.Audio
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public int ChannelCount
         {
             get
             {
-                return _source.ChannelCount;
+                return _input.ChannelCount;
             }
         }
 
@@ -105,7 +105,7 @@ namespace tapetool2.Audio
         {
             get
             {
-                return _source.BitsPerSample;
+                return _input.BitsPerSample;
             }
         }
 
@@ -113,7 +113,7 @@ namespace tapetool2.Audio
         {
             get
             {
-                return _source.SampleRate;
+                return _input.SampleRate;
             }
         }
 
@@ -133,12 +133,12 @@ namespace tapetool2.Audio
 
         void ProcessSample()
         {
-            if (_source.Next())
+            if (_input.Next())
             {
                 // Pump next sample from the source
                 for (int i = 0; i < _channelStreams.Count; i++)
                 {
-                    _channelStreams[i].Process(_source.GetSample(i));
+                    _channelStreams[i].Process(_input.GetSample(i));
                 }
             }
             else

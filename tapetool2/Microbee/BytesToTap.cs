@@ -15,7 +15,7 @@ namespace tapetool2.Microbee
         {
         }
 
-        IByteStream _source;
+        IByteStream _input;
         TapeHeader _header;
         State _state;
         int _stateByteCount;
@@ -85,11 +85,11 @@ namespace tapetool2.Microbee
             set { _autostart = value; }
         }
 
-        [Source]
-        public IByteStream Source
+        [InputStream]
+        public IByteStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
         int IBaudRateProvider.BaudRate
@@ -154,12 +154,12 @@ namespace tapetool2.Microbee
             // Work out how long data is
             if (_header.datalen == 0)
             {
-                _source.Rewind();
-                while (_source.Next())
+                _input.Rewind();
+                while (_input.Next())
                 {
                     _header.datalen++;
                 }
-                _source.Rewind();
+                _input.Rewind();
             }
 
             // Get the header bytes
@@ -180,7 +180,7 @@ namespace tapetool2.Microbee
                     return _headerBytes[_stateByteIndex];
 
                 case State.block:
-                    return _source.GetByte();
+                    return _input.GetByte();
 
                 case State.headerChecksum:
                 case State.blockChecksum:
@@ -193,12 +193,12 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public void CheckedNext()
         {
-            if (!_source.Next())
+            if (!_input.Next())
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
@@ -238,7 +238,7 @@ namespace tapetool2.Microbee
                     // EOF?
                     if (_blockAddress > _header.datalen)
                     {
-                        _source.Next();     // Not necessary but lets text writers flush eof tag 
+                        _input.Next();     // Not necessary but lets text writers flush eof tag 
                         return false;
                     }
 

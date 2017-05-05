@@ -45,10 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\StreamConverterAttribute.cs" />
     <Compile Include="BinaryFiles\BinaryReader.cs" />
     <Compile Include="Microbee\BitsToBytes.cs" />
     <Compile Include="Microbee\AudioToCycleKinds.cs" />
     <Compile Include="Microbee\BlocksToBytes.cs" />
+    <Compile Include="Microbee\Conversions.cs" />
     <Compile Include="Microbee\RenderAudio.cs" />
     <Compile Include="Microbee\SetHeader.cs" />
     <Compile Include="Microbee\CycleKindsToAudio.cs" />
@@ -60,10 +62,12 @@
     <Compile Include="BinaryFiles\BinaryWriter.cs" />
     <Compile Include="Microbee\IBlockStream.cs" />
     <Compile Include="Microbee\ParseAudio.cs" />
+    <Compile Include="Microbee\StreamConversions.cs" />
     <Compile Include="Microbee\TapFileWriter.cs" />
     <Compile Include="Microbee\TapToBytes.cs" />
     <Compile Include="Microbee\ITapStream.cs" />
     <Compile Include="Microbee\TapeHeader.cs" />
+    <Compile Include="Reflection\StreamConversion.cs" />
     <Compile Include="StreamKinds\CompositeStream.cs" />
     <Compile Include="StreamKinds\IStream.cs" />
     <Compile Include="StreamKinds\ICycleKindStream.cs" />
@@ -74,7 +78,7 @@
     <Compile Include="TextFiles\TextCycleKindWriter.cs" />
     <Compile Include="Utils\BitStreamUtils.cs" />
     <Compile Include="Attributes\StreamKindAttribute.cs" />
-    <Compile Include="Attributes\SourceAttribute.cs" />
+    <Compile Include="Attributes\InputStreamAttribute.cs" />
     <Compile Include="Attributes\FilterOptionAttribute.cs" />
     <Compile Include="Attributes\FileFilterAttribute.cs" />
     <Compile Include="Attributes\FileReaderAttribute.cs" />
@@ -104,6 +108,7 @@
     <Compile Include="Dsp\Resampler.cs" />
     <Compile Include="Audio\WaveUtils.cs" />
     <Compile Include="Utils\CommandLine.cs" />
+    <Compile Include="Utils\CustomAttributeExtensions.cs" />
     <Compile Include="Utils\Glob.cs" />
   </ItemGroup>
   <ItemGroup>

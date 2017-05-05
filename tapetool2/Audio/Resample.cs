@@ -16,15 +16,15 @@ namespace tapetool2.Audio
             _targetSampleRate = 44100;
         }
 
-        IAudioStream _source;
+        IAudioStream _input;
         int _targetSampleRate;
         Resampler.Quality _quality;
 
-        [Source]
-        public IAudioStream Source
+        [InputStream]
+        public IAudioStream Input
         {
-            get { return _source; }
-            set { _source = value; }
+            get { return _input; }
+            set { _input = value; }
         }
 
 
@@ -83,7 +83,7 @@ namespace tapetool2.Audio
             for (int i=0; i<ChannelCount; i++)
             {
                 // Create a resampler
-                var r = new Resampler(_source.SampleRate, _targetSampleRate, _quality);
+                var r = new Resampler(_input.SampleRate, _targetSampleRate, _quality);
 
                 // How big should the buffer be?
                 _requiredSurroundingSamples = r.RequiredSurroundingSamples;
@@ -122,12 +122,12 @@ namespace tapetool2.Audio
             {
                 for (int i=0; i<additionalSamples; i++)
                 {
-                    if (_source.Next())
+                    if (_input.Next())
                     {
                         // Fill with source samples
                         for (int ch = 0; ch < ChannelCount; ch++)
                         {
-                            _channelStreams[ch].Append(_bufferFillLevel, _source.GetSample(ch));
+                            _channelStreams[ch].Append(_bufferFillLevel, _input.GetSample(ch));
                         }
                         _bufferFillLevel++;
                         _bufferedSourceSamples++;
@@ -162,14 +162,14 @@ namespace tapetool2.Audio
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         public int ChannelCount
         {
             get
             {
-                return _source.ChannelCount;
+                return _input.ChannelCount;
             }
         }
 
@@ -177,7 +177,7 @@ namespace tapetool2.Audio
         {
             get
             {
-                return _source.BitsPerSample;
+                return _input.BitsPerSample;
             }
         }
 

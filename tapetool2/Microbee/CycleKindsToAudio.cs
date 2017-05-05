@@ -14,15 +14,15 @@ namespace tapetool2.Microbee
         {
         }
 
-        ICycleKindStream _source;
+        ICycleKindStream _input;
     
-        [Source]
-        public ICycleKindStream Source
+        [InputStream]
+        public ICycleKindStream Input
         {
-            get { return _source; }
+            get { return _input; }
             set
             {
-                _source = value;
+                _input = value;
             }
         }
 
@@ -39,7 +39,7 @@ namespace tapetool2.Microbee
         }
 
         [FilterOption("volume", "volume which to render (default=0.75)")]
-        public int Volume
+        public float Volume
         {
             set
             {
@@ -84,7 +84,7 @@ namespace tapetool2.Microbee
 
         public override IEnumerable<IStream> GetPrecedents()
         {
-            yield return _source;
+            yield return _input;
         }
 
         const double highCycleTime = 1.0 / 2400;
@@ -108,22 +108,22 @@ namespace tapetool2.Microbee
                 _currentSample = true;
 
                 // Read the first cycle kind
-                return _source.Next();
+                return _input.Next();
             }
 
             double currentTime = (double)_currentSampleNumber / _sampleRate;
             double currentTimeInCycle = currentTime - _currentCycleTime;
-            double currentCycleLength = _source.GetCycleKind() == CycleKind.High ? highCycleTime : lowCycleTime;
+            double currentCycleLength = _input.GetCycleKind() == CycleKind.High ? highCycleTime : lowCycleTime;
 
             if (currentTimeInCycle >= currentCycleLength)
             {
                 // Get the next cycle kind
-                if (!_source.Next())
+                if (!_input.Next())
                     return false;
 
                 _currentCycleTime += currentCycleLength;
                 currentTimeInCycle = currentTime - _currentCycleTime;
-                currentCycleLength = _source.GetCycleKind() == CycleKind.High ? highCycleTime : lowCycleTime;
+                currentCycleLength = _input.GetCycleKind() == CycleKind.High ? highCycleTime : lowCycleTime;
             }
 
             _currentSample = currentTimeInCycle < currentCycleLength / 2;

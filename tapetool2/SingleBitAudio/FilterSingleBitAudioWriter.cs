@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 namespace tapetool2
 {
     [FileWriter("singleBitAudioWriter", "Single bit audio file writer", "sba", "Single bit audio stream")]
-    class FilterSingleBitAudioWriter : FilterSingleBitAudioStream
+    class FilterSingleBitAudioWriter : FilterAudio
     {
-        public FilterSingleBitAudioWriter(string filename, FilterSingleBitAudioStream source)
+        public FilterSingleBitAudioWriter(string filename, FilterAudio source)
         {
             Filename = filename;
             _source = source;
         }
 
-        FilterSingleBitAudioStream _source;
+        FilterAudio _source;
 
         [Source]
-        public FilterSingleBitAudioStream Source
+        public FilterAudio Source
         {
             get { return _source; }
             set { _source = value; }
@@ -30,6 +30,16 @@ namespace tapetool2
             get;
             set;
         }
+
+        float _threshold = 0.0f;
+
+        [FilterOption("threshold", "audio level threshold for bit value 1")]
+        public float Threshold
+        {
+            get { return _threshold; }
+            set { _threshold = value; }
+        }
+
 
 
         FileStream _stream;
@@ -69,9 +79,25 @@ namespace tapetool2
             }
         }
 
-        public override bool GetSample()
+        public override int ChannelCount
         {
-            return _source.GetSample();
+            get
+            {
+                return 1;
+            }
+        }
+
+        public override int BitsPerSample
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public override float GetSample(int channel)
+        {
+            return _source.GetSample(channel);
         }
 
         public override bool Next()
@@ -80,7 +106,7 @@ namespace tapetool2
                 return false;
 
             // Write the current bit
-            _unwrittenBits = (byte)(_unwrittenBits >> 1 | (GetSample() ? 0x80 : 0x00));
+            _unwrittenBits = (byte)(_unwrittenBits >> 1 | (GetSample(0) >= _threshold ? 0x80 : 0x00));
             _unwrittenBitCount++;
             if (_unwrittenBitCount == 8)
             {

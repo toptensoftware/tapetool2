@@ -91,21 +91,6 @@ namespace tapetool2
             if (other is FilterAudio)
                 return (FilterAudio)other;
 
-            if (other is FilterSingleBitAudioStream)
-                return new FilterSingleBitAudioToAudio() { Source = (FilterSingleBitAudioStream)other };
-
-            throw new InvalidOperationException(string.Format("Don't know how to convert from {0} to audio", other.GetType().Name));
-        }
-
-        static FilterSingleBitAudioStream ConvertToAudioBitStream(Filter other)
-        {
-            // Already audio?
-            if (other is FilterAudio)
-                return new FilterAudioToSingleBitAudio() { Source = (FilterAudio)other };
-
-            if (other is FilterSingleBitAudioStream)
-                return (FilterSingleBitAudioStream)other;
-
             throw new InvalidOperationException(string.Format("Don't know how to convert from {0} to audio", other.GetType().Name));
         }
 
@@ -133,10 +118,6 @@ namespace tapetool2
                 if (prop.PropertyType == typeof(FilterAudio))
                 {
                     source = ConvertToAudio(source);
-                }
-                else if (prop.PropertyType == typeof(FilterSingleBitAudioStream))
-                {
-                    source = ConvertToAudioBitStream(source);
                 }
 
                 if (!prop.PropertyType.IsAssignableFrom(source.GetType()))

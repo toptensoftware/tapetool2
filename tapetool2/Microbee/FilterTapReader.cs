@@ -109,12 +109,12 @@ namespace tapetool2.Microbee
                 return (FilterCycleKindStream)s4;
             }
 
-            if (filterType == typeof(FilterSingleBitAudioStream))
+            if (filterType == typeof(FilterAudio))
             {
                 // Render cycle kinds as audio samples
                 var s5 = new FilterAudioCycleGenerator();
                 s5.Source = ConvertTo<FilterCycleKindStream>();
-                return (FilterSingleBitAudioStream)s5;
+                return (FilterAudio)s5;
             }
 
             return null;

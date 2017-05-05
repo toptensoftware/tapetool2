@@ -58,9 +58,8 @@
     <Compile Include="Microbee\FilterTapStreamDecoder.cs" />
     <Compile Include="Microbee\FilterTapStream.cs" />
     <Compile Include="Microbee\TapeHeader.cs" />
-    <Compile Include="StreamKinds\FilterSingleBitAudioStream.cs" />
+    <Compile Include="StreamKinds\IStream.cs" />
     <Compile Include="StreamKinds\FilterCycleKindStream.cs" />
-    <Compile Include="TextFiles\FilterTextSingleBitAudioStreamWriter.cs" />
     <Compile Include="TextFiles\FilterTextBitStreamWriter.cs" />
     <Compile Include="TextFiles\FilterTextByteStreamWriter.cs" />
     <Compile Include="TextFiles\FilterTextCycleKindWriter.cs" />
@@ -76,12 +75,10 @@
     <Compile Include="Reflection\FilterInfo.cs" />
     <Compile Include="Microbee\FilterTapReader.cs" />
     <Compile Include="StreamKinds\FilterByteStream.cs" />
-    <Compile Include="SingleBitAudio\FilterSingleBitAudioToAudio.cs" />
     <Compile Include="StreamKinds\Filter.cs" />
     <Compile Include="Audio\FilterAudioBiasAdjust.cs" />
     <Compile Include="Audio\FilterAudioGain.cs" />
     <Compile Include="StreamKinds\FilterBitStream.cs" />
-    <Compile Include="SingleBitAudio\FilterAudioToSingleBitAudio.cs" />
     <Compile Include="Audio\FilterAudioSelectChannel.cs" />
     <Compile Include="Audio\FilterAudioChannelMultiCast.cs" />
     <Compile Include="Audio\FilterAudioMono.cs" />

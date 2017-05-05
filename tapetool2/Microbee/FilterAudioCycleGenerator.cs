@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace tapetool2.Microbee
 {
     [Filter("microbeeAudioCycleGenerator", "Generates Microbee audio cycles from a cycle kind stream")]
-    class FilterAudioCycleGenerator : FilterSingleBitAudioStream
+    class FilterAudioCycleGenerator : FilterAudio
     {
         public FilterAudioCycleGenerator()
         {
@@ -26,6 +26,7 @@ namespace tapetool2.Microbee
         }
 
         int _sampleRate = 24000;
+        float _volume;
 
         [FilterOption("sampleRate", "sample rate at which to render")]
         public int SampleRateOption
@@ -36,11 +37,37 @@ namespace tapetool2.Microbee
             }
         }
 
+        [FilterOption("volume", "volume which to render (default=0.75)")]
+        public int Volume
+        {
+            set
+            {
+                _volume = value;
+            }
+        }
+
         public override int SampleRate
         {
             get
             {
                 return _sampleRate;
+            }
+        }
+
+        public override int ChannelCount
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+
+        public override int BitsPerSample
+        {
+            get
+            {
+                return 8;
             }
         }
 
@@ -62,9 +89,9 @@ namespace tapetool2.Microbee
         const double highCycleTime = 1.0 / 2400;
         const double lowCycleTime = 1.0 / 1200;
 
-        public override bool GetSample()
+        public override float GetSample(int channel)
         {
-            return _currentSample;
+            return _currentSample ? _volume : -_volume;
         }
 
         public override bool Next()

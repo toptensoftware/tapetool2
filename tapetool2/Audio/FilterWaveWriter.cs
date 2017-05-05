@@ -99,6 +99,9 @@ namespace tapetool2
             _binaryWriter = new BinaryWriter(_stream, Encoding.UTF8, true);
             _bitsPerSample = _source.BitsPerSample;
 
+            if (_bitsPerSample < 8)
+                _bitsPerSample = 8;
+
             WriteHeader();
         }
 

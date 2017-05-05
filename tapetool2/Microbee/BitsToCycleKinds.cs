@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeBitsToCycleKinds", "Generates Microbee cycle kinds from a bit stream")]
+    [Filter("microbee.bitsToCycleKinds", "Generates Microbee cycle kinds from a bit stream")]
     class BitsToCycleKinds : StreamBase, ICycleKindStream
     {
         public BitsToCycleKinds()

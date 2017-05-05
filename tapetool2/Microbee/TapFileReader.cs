@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [FileReader("microbeeTapFileReader", "Microbee tape file reader", "tap", "Microbee tap file")]
+    [FileReader("microbee.tapFileReader", "Microbee tape file reader", "tap", "Microbee tap file")]
     class TapFileReader : StreamBase, IByteStream
     {
         public TapFileReader()

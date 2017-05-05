@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeBitsToBytes", "Decodes a Microbee bit stream into byte stream")]
+    [Filter("microbee.bitsToBytes", "Decodes a Microbee bit stream into byte stream")]
     class BitsToBytes : StreamBase, IByteStream, ISetUpstreamBaudRate
     {
         public BitsToBytes()

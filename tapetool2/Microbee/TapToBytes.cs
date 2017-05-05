@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeTapToBytes", "Decodes a Microbee tap byte stream")]
+    [Filter("microbee.tapToBytes", "Decodes a Microbee tap byte stream")]
     class TapToBytes : StreamBase, ITapStream
     {
         public TapToBytes()
@@ -57,6 +57,24 @@ namespace tapetool2.Microbee
 
             // Store parsed header
             _header = TapeHeader.FromBytes(header);
+
+            // Set the upstream baud rate for correct bit decoding
+            var usbr = UpstreamOfType<ISetUpstreamBaudRate>();
+            if (usbr!= null)
+            {
+                switch (_header.speed)
+                {
+                    case 0:
+                        usbr.SetUpstreamBaudRate(300);
+                        break;
+                    case 2:
+                        usbr.SetUpstreamBaudRate(600);
+                        break;
+                    case 0xFF:
+                        usbr.SetUpstreamBaudRate(1200);
+                        break;
+                }
+            }
 
             // Start block
             _blockAddress = 0;

@@ -1,0 +1,51 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace tapetool2.Microbee
+{
+    [Filter("microbee.parseAudio", "Parses a Microbee audio stream into tap file stream")]
+    class ParseAudio : CompositeStream, IBlockStream, IBaudRateProvider
+    {
+        public ParseAudio()
+        {
+            Add(new AudioToCycleKinds());
+            Add(new CycleKindsToBits());
+            Add(new BitsToBytes());
+            Add(new BytesToBlocks());
+        }
+
+
+        [Source]
+        public IAudioStream Source
+        {
+            set
+            {
+                ((AudioToCycleKinds)First).Source = value;
+            }
+        }
+
+        public int BaudRate
+        {
+            get
+            {
+                return ((IBaudRateProvider)Last).BaudRate;
+            }
+        }
+
+        public TapeHeader Header
+        {
+            get
+            {
+                return ((BytesToBlocks)Last).Header;
+            }
+        }
+
+        public Block GetBlock()
+        {
+            return ((BytesToBlocks)Last).GetBlock();
+        }
+    }
+}

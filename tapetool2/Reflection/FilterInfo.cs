@@ -61,6 +61,25 @@ namespace tapetool2
             get { return _all.Values.OrderBy(x => x.Name); }
         }
 
+        public static IEnumerable<string> Namespaces
+        {
+            get
+            {
+                var namespaces = new HashSet<string>();
+
+                foreach (var i in SupportedFilters)
+                {
+                    int dotPos = i.Name.IndexOf('.');
+                    if (dotPos >= 0)
+                    {
+                        namespaces.Add(i.Name.Substring(0, dotPos));
+                    }
+                }
+
+                return namespaces.OrderBy(x => x);
+            }
+        }
+
         public static FilterInfo FindByName(string name)
         {
             FilterInfo info;

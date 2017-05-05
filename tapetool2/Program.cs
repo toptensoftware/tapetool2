@@ -33,17 +33,31 @@ namespace tapetool2
             foreach (var i in FilterInfo.SupportedFilters)
             {
                 Console.WriteLine("  {0,-27} {1}", i.Name, i.Description);
+
             }
 
             Console.WriteLine("\nOptions:");
             Console.WriteLine("  {0,-27} {1}", "-h | --help", "Show these usage instructions, or use after command name for help on that command");
             Console.WriteLine("  {0,-27} {1}", "-v | --version", "Show version number");
 
+            foreach (var ns in FilterInfo.Namespaces)
+            {
+                Console.WriteLine("  {0,-27} {1}", string.Format("--{0}", ns), string.Format("Use namespace '{0}'", ns));
+            }
+
             Console.WriteLine("\n");
         }
 
         static string StreamKind(Type t)
         {
+            // If it's a class we really want to find it's stream interface
+            if (t.IsClass)
+            {
+                var itf = t.GetInterfaces().FirstOrDefault(x => typeof(IStream).IsAssignableFrom(x) && x != typeof(IStream));
+                if (itf != null)
+                    t = itf;
+            }
+
             var srcInfo = t.GetCustomAttributes(true).OfType<StreamKindAttribute>().FirstOrDefault();
             if (srcInfo != null)
                 return srcInfo.Name;
@@ -96,31 +110,11 @@ namespace tapetool2
             prop.SetValue(stream, filename);
         }
 
-        public static void ConnectStreams(IStream target, IStream source)
-        {
-            // Find the source property
-            var prop = target.GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<SourceAttribute>().Any());
-
-            if (source != null)
-            {
-                if (prop == null)
-                    throw new InvalidOperationException(string.Format("{0} doesn't have a source property and must be the first in the chain", target.GetType().Name));
-
-                if (!prop.PropertyType.IsAssignableFrom(source.GetType()))
-                {
-                    var converted = source.ConvertTo(prop.PropertyType);
-                    if (converted == null)
-                        throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2})", target.GetType().Name, source.GetType().Name, prop.PropertyType.Name));
-                }
-
-                // Assign it
-                prop.SetValue(target, source);
-            }
-        }
 
         static IStream lhsStream;
         static IStream firstStream;
         static bool showFilterHelp;
+        static string _currentNamespace;
 
         static void ProcessArg(string arg)
         {
@@ -194,10 +188,15 @@ namespace tapetool2
                         ShowLogo();
                         return;
                 }
+
+                if (FilterInfo.Namespaces.Contains(SwitchName, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    _currentNamespace = SwitchName;
+                }
             }
             else
             {
-                IStream nextStream;
+                IStream nextStream = null;
 
                 // Is it a file name?
                 var rdot = arg.LastIndexOf('.');
@@ -207,41 +206,53 @@ namespace tapetool2
                     var fti = FileTypeInfo.FromExtension(ext);
                     if (fti == null)
                     {
-                        throw new InvalidOperationException(string.Format("Unsupported file type: {0}", ext));
-                    }
-
-                    if (lhsStream == null)
-                    {
-                        if (fti.ReaderClass == null)
-                            throw new InvalidOperationException(string.Format("Reading {0} files not supported", ext));
-
-                        nextStream = (IStream)Activator.CreateInstance(fti.ReaderClass);
+                        if (FilterInfo.Namespaces.Contains(arg.Substring(0, rdot), StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            // It might be a filter qualifier and not really a filename
+                            // eg: microbee.renderAudio
+                        }
+                        else   
+                            throw new InvalidOperationException(string.Format("Unsupported file type: {0}", ext));
                     }
                     else
                     {
-                        if (fti.WriterClass == null)
-                            throw new InvalidOperationException(string.Format("Writing {0} files not supported", ext));
+                        if (lhsStream == null)
+                        {
+                            if (fti.ReaderClass == null)
+                                throw new InvalidOperationException(string.Format("Reading {0} files not supported", ext));
 
-                        nextStream = (IStream)Activator.CreateInstance(fti.WriterClass);
+                            nextStream = (IStream)Activator.CreateInstance(fti.ReaderClass);
+                        }
+                        else
+                        {
+                            if (fti.WriterClass == null)
+                                throw new InvalidOperationException(string.Format("Writing {0} files not supported", ext));
+
+                            nextStream = (IStream)Activator.CreateInstance(fti.WriterClass);
+                        }
+
+                        // Set the filename of the file reader/writer
+                        SetFileName(nextStream, System.IO.Path.GetFullPath(arg));
                     }
-
-                    // Set the filename of the file reader/writer
-                    SetFileName(nextStream, System.IO.Path.GetFullPath(arg));
                 }
-                else
+
+                if (nextStream == null)
                 {
                     // Find filter info
                     var fi = FilterInfo.FindByName(arg);
-                    if (fi == null)
+                    if (fi == null && _currentNamespace != null)
                     {
-                        throw new InvalidOperationException(string.Format("Unknown filter type: {0}", arg));
+                        fi = FilterInfo.FindByName(string.Format("{0}.{1}", _currentNamespace, arg));
                     }
+
+                    if (fi == null)
+                        throw new InvalidOperationException(string.Format("Unknown filter type: {0}", arg));
 
                     // Create instance
                     nextStream = (IStream)Activator.CreateInstance(fi.Type);
                 }
 
-                ConnectStreams(nextStream, lhsStream);
+                nextStream.SetSource(lhsStream);
                 lhsStream = nextStream;
                 if (firstStream == null)
                     firstStream = lhsStream;

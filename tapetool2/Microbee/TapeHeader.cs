@@ -56,5 +56,13 @@ namespace tapetool2.Microbee
             }
             return bytes;
         }
+
+        public byte Checksum
+        {
+            get
+            {
+                return (byte)(0x100 - (byte)(ToBytes().Select(x => (int)x).Sum() + 16));
+            }
+        }
     }
 }

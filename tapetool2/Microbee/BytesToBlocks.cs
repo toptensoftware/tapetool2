@@ -7,13 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-/*
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeTapStreamDecoder", "Decodes a Microbee tap byte stream")]
-    class FilterTapStreamDecoder : ITapStream
+    [Filter("microbee.bytesToBlocks", "Decodes a Microbee byte stream into blocks")]
+    class BytesToBlocks : StreamBase, IBlockStream
     {
-        public FilterTapStreamDecoder()
+        public BytesToBlocks()
         {
         }
 
@@ -58,11 +57,29 @@ namespace tapetool2.Microbee
             // Store parsed header
             _header = TapeHeader.FromBytes(header);
 
+            // Set the upstream baud rate for correct bit decoding
+            var usbr = UpstreamOfType<ISetUpstreamBaudRate>();
+            if (usbr != null)
+            {
+                switch (_header.speed)
+                {
+                    case 0:
+                        usbr.SetUpstreamBaudRate(300);
+                        break;
+                    case 2:
+                        usbr.SetUpstreamBaudRate(600);
+                        break;
+                    case 0xFF:
+                        usbr.SetUpstreamBaudRate(1200);
+                        break;
+                }
+            }
+
             // Start block
             _blockAddress = 0;
         }
 
-        public override TapeHeader Header
+        public TapeHeader Header
         {
             get
             {
@@ -72,7 +89,7 @@ namespace tapetool2.Microbee
 
         Block _currentBlock;
 
-        public override Block GetBlock()
+        public Block GetBlock()
         {
             return _currentBlock;
         }
@@ -98,7 +115,7 @@ namespace tapetool2.Microbee
 
             // How many bytes in this block
             var bytesInBlock = Math.Min((ushort)(_header.datalen - _blockAddress), (ushort)0x100);
-            var checksum = (byte)_bytesLeftInBlock;
+            var checksum = (byte)bytesInBlock;
 
             // Read bytes
             var data = new byte[bytesInBlock];
@@ -124,36 +141,10 @@ namespace tapetool2.Microbee
 
             _currentBlock = block;
             _blockAddress += 0x100;
+
+            return true;
         }
 
     }
 }
 
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace tapetool2.Microbee
-{
-    [StreamKind("Microbee tap stream", "Microbee tap stream")]
-    abstract class ITapStream : Filter
-    {
-        public abstract TapeHeader Header
-        {
-            get;
-        }
-
-        public abstract Block GetBlock();
-
-        public class Block
-        {
-            public ushort Address;
-            public byte[] Data;
-            public byte Checksum;
-        }
-    }
-}
-*/

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeCycleKindToAudio", "Generates Microbee audio cycles from a cycle kind stream")]
-    class CycleKindToAudio : StreamBase, IAudioStream
+    [Filter("microbee.cycleKindsToAudio", "Generates Microbee audio cycles from a cycle kind stream")]
+    class CycleKindsToAudio : StreamBase, IAudioStream
     {
-        public CycleKindToAudio()
+        public CycleKindsToAudio()
         {
         }
 
@@ -27,7 +27,7 @@ namespace tapetool2.Microbee
         }
 
         int _sampleRate = 24000;
-        float _volume;
+        float _volume = 0.75f;
 
         [FilterOption("sampleRate", "sample rate at which to render")]
         public int SampleRateOption

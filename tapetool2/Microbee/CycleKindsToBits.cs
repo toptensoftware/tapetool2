@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace tapetool2.Microbee
 {
 
-    [Filter("microbeeCycleKindsToBits", "Parses Microbee cycle kinds into a bit stream")]
+    [Filter("microbee.cycleKindsToBits", "Parses Microbee cycle kinds into a bit stream")]
     class CycleKindsToBits : StreamBase, IBitStream, ISetUpstreamBaudRate
     {
         public CycleKindsToBits()

@@ -26,5 +26,29 @@ namespace tapetool2
             get;
             private set;
         }
+
+        string _extension;
+        public string FileExtension
+        {
+            get { return _extension; }
+            set
+            {
+                if (!value.StartsWith("."))
+                    value = "." + value;
+                _extension = value;
+            }
+        }
+
+        public bool IsFileReader
+        {
+            get;
+            set;
+        }
+
+        public bool IsFileWriter
+        {
+            get;
+            set;
+        }
     }
 }

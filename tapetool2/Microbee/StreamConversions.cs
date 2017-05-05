@@ -38,5 +38,46 @@ namespace tapetool2.Microbee
             return new BlocksToBytes() { Input = new ParseAudio() { Input = audio } };
         }
 
+        [StreamConverter(Namespace = "microbee")]
+        public static ICycleKindStream ConvertAudioToCycleKinds(IAudioStream audio)
+        {
+            return new AudioToCycleKinds() { Input = audio };
+        }
+
+        [StreamConverter(Namespace = "microbee")]
+        public static IBitStream ConvertAudioToBits(IAudioStream audio)
+        {
+            return new BytesToBits()
+            {
+                Input = new BlocksToBytes()
+                {
+                    Input = new ParseAudio()
+                    {
+                        Input = audio
+                    }
+                }
+            };
+        }
+
+        [StreamConverter(Namespace = "microbee")]
+        public static IAudioStream ConvertBitsToAudio(IBitStream from)
+        {
+            return new RenderAudio()
+            {
+                Input = new BytesToBlocks()
+                {
+                    Input = new BitsToBytes()
+                    {
+                        Input = from
+                    }
+                }
+            };
+        }
+
+        [StreamConverter(Namespace="microbee")]
+        public static IAudioStream ConvertCycleKindsToAudio(ICycleKindStream cycles)
+        {
+            return new CycleKindsToAudio() { Input = cycles };
+        }
     }
 }

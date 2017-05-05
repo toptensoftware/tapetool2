@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 namespace tapetool2
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class FileWriterAttribute : FileFilterAttribute
+    public class FileWriterAttribute : FilterAttribute
     {
-        public FileWriterAttribute(string name, string description, string extension, string fileTypeName) : base(name, description, extension, fileTypeName)
+        public FileWriterAttribute(string name, string description, string extension) 
+            : base(name, description)
         {
+            FileExtension = extension;
+            IsFileWriter = true;
         }
 
     }

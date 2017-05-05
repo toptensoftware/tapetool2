@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.SingleBitAudio
 {
-    [FileReader("singleBitAudioReader", "Single bit audio file reader", "sba", "Single bit audio stream")]
+    [FileReader("singleBitAudioReader", "Single bit audio file reader", "sba")]
     class SingleBitAudioReader : StreamBase, IAudioStream
     {
         public SingleBitAudioReader()

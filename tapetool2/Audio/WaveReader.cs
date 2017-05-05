@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Audio
 {
-    [FileReader("waveReader", "Wave file reader", "wav", "Standard wav file")]
+    [FileReader("waveReader", "Wave file reader", "wav")]
     class WaveReader : StreamBase, IAudioStream
     {
         public WaveReader()

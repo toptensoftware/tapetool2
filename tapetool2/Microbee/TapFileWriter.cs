@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [FileWriter("microbee.tapFileWriter", "Mirobee tape file writer", "tap", "Microbee tap file")]
+    [FileWriter("microbee.tapFileWriter", "Mirobee tape file writer", "tap")]
     class TapFileWriter : StreamBase, IByteStream
     {
         public TapFileWriter()

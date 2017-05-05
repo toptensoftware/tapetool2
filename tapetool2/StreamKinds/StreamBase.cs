@@ -12,7 +12,7 @@ namespace tapetool2
         {
         }
 
-        public virtual void SetInput(IStream input)
+        public virtual void SetInput(IStream input, string conversionNamespace)
         {
             // Find the intput property
             var prop = GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<InputStreamAttribute>().Any());
@@ -24,9 +24,18 @@ namespace tapetool2
 
                 if (!prop.PropertyType.IsAssignableFrom(input.GetType()))
                 {
-                    var converted = StreamConversion.ConvertStream(input, prop.PropertyType, GetType());
+                    var converted = StreamConversion.ConvertStream(input, prop.PropertyType, GetType(), conversionNamespace);
                     if (converted == null)
-                        throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2})", GetType().Name, input.GetType().Name, prop.PropertyType.Name));
+                    {
+                        var namespaces = StreamConversion.FindPossibleConversionNamespaces(input.GetType(), prop.PropertyType, GetType());
+                        var suggestion = string.Join(" or ", namespaces.Select(x => "--" + x ));
+                        if (suggestion.Length > 0)
+                        {
+                            suggestion = ".\n\nAn automatic conversion is available if " + suggestion + " is specified before the target stream";
+                        }
+
+                        throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2}){3}", GetType().Name, input.GetType().Name, prop.PropertyType.Name, suggestion));
+                    }
                     input = converted;
                 }
 

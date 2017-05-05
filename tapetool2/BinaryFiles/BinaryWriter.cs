@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Binary
 {
-    [FileWriter("binWriter", "Binary file writer", "bin", "Binary file")]
+    [FileWriter("binWriter", "Binary file writer", "bin")]
     class BinaryWriter : StreamBase, IByteStream
     {
         public BinaryWriter()

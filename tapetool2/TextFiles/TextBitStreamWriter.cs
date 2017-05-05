@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Text
 {
-    [FileWriter("textBitStreamWriter", "Text bit-stream file writer", "txt", "Text file")]
+    [FileWriter("textBitStreamWriter", "Text bit-stream file writer", ".bits.txt")]
     class TextBitStreamWriter : StreamBase, IBitStream
     {
         public TextBitStreamWriter()

@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 namespace tapetool2
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class FileReaderAttribute : FileFilterAttribute
+    public class FileReaderAttribute : FilterAttribute
     {
-        public FileReaderAttribute(string name, string description, string extension, string fileTypeName) : base(name, description, extension, fileTypeName)
+        public FileReaderAttribute(string name, string description, string extension) : base(name, description)
         {
+            FileExtension = extension;
+            IsFileReader = true;
         }
-
     }
 }

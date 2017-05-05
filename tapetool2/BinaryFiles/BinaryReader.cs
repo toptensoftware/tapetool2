@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Binary
 {
-    [FileReader("binReader", "Binary file reader", "bin", "Binary file")]
+    [FileReader("binReader", "Binary file reader", "bin")]
     class BinaryReader : StreamBase, IByteStream
     {
         public BinaryReader()

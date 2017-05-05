@@ -18,5 +18,11 @@ namespace tapetool2
             get;
             set;
         }
+
+        public string Namespace
+        {
+            get;
+            set;
+        }
     }
 }

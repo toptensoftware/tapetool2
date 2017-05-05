@@ -23,26 +23,24 @@ namespace tapetool2
         {
             Console.WriteLine("Usage: tapetool2 [filters...]");
 
-            Console.WriteLine("\nFile Types:");
-            foreach (var i in FileTypeInfo.SupportedFileTypes)
-            {
-                Console.WriteLine("  *.{0,-25} {1} ({2})", i.Extension, i.FileTypeName, i.Capabilities);
-            }
-
-            Console.WriteLine("\nFilters:");
+            Console.WriteLine("\nSupported Filters:");
             foreach (var i in FilterInfo.SupportedFilters)
             {
-                Console.WriteLine("  {0,-27} {1}", i.Name, i.Description);
-
+                Console.Write("  {0,-30} {1}", i.Name, i.Description);
+                if (!string.IsNullOrEmpty(i.Attributes.FileExtension))
+                {
+                    Console.Write(" (*{0} {1})", i.Attributes.FileExtension, i.Attributes.IsFileReader ? "reader" : "writer");
+                }
+                Console.WriteLine();
             }
 
             Console.WriteLine("\nOptions:");
-            Console.WriteLine("  {0,-27} {1}", "-h | --help", "Show these usage instructions, or use after command name for help on that command");
-            Console.WriteLine("  {0,-27} {1}", "-v | --version", "Show version number");
+            Console.WriteLine("  {0,-30} {1}", "-h | --help", "Show these usage instructions, or use after filter name for help on that filter");
+            Console.WriteLine("  {0,-30} {1}", "-v | --version", "Show version number");
 
             foreach (var ns in FilterInfo.Namespaces)
             {
-                Console.WriteLine("  {0,-27} {1}", string.Format("--{0}", ns), string.Format("Use namespace '{0}'", ns));
+                Console.WriteLine("  {0,-30} {1}", string.Format("--{0}", ns), string.Format("Use filters '{0}.*'", ns));
             }
 
             Console.WriteLine("\n");
@@ -87,28 +85,21 @@ namespace tapetool2
                     firstArg = false;
                 }
 
-                Console.WriteLine("  {0,-27} {1}", "--" + attr.Name + ":val", attr.Description);
+                Console.WriteLine("  {0,-30} {1}", "--" + attr.Name + ":val", attr.Description);
             }
 
             Console.WriteLine();
-        }
-
-        public static void SetFileName(IStream stream, string filename)
-        {
-            // Find the filename property
-            var prop = stream.GetType().GetProperties().FirstOrDefault(x => x.Name == "Filename");
-            if (prop == null)
-                throw new InvalidOperationException("Filter doesn't support Filename property??");
-
-            // Set it
-            prop.SetValue(stream, filename);
         }
 
         static void ShowChain(IStream stm)
         {
             foreach (var inp in stm.EnumStreams())
                 ShowChain(inp);
-            Console.WriteLine("{0}", FilterInfo.NameOfFilter(stm));
+
+            if (stm is CompositeStream)
+                Console.WriteLine("[{0}]", FilterInfo.NameOfFilter(stm));
+            else
+                Console.WriteLine("{0}", FilterInfo.NameOfFilter(stm));
         }
 
         static bool SetArgument(IStream stopPos, IStream stm, string name, string value)
@@ -216,44 +207,10 @@ namespace tapetool2
             {
                 IStream nextStream = null;
 
-                // Is it a file name?
-                var rdot = arg.LastIndexOf('.');
-                if (rdot >= 0)
-                {
-                    var ext = arg.Substring(rdot + 1);
-                    var fti = FileTypeInfo.FromExtension(ext);
-                    if (fti == null)
-                    {
-                        if (FilterInfo.Namespaces.Contains(arg.Substring(0, rdot), StringComparer.InvariantCultureIgnoreCase))
-                        {
-                            // It might be a filter qualifier and not really a filename
-                            // eg: microbee.renderAudio
-                        }
-                        else   
-                            throw new InvalidOperationException(string.Format("Unsupported file type: {0}", ext));
-                    }
-                    else
-                    {
-                        if (lastStream == null)
-                        {
-                            if (fti.ReaderClass == null)
-                                throw new InvalidOperationException(string.Format("Reading {0} files not supported", ext));
+                // Try creating a file stream first
+                nextStream = FilterInfo.CreateFileStream(arg, lastStream);
 
-                            nextStream = (IStream)Activator.CreateInstance(fti.ReaderClass);
-                        }
-                        else
-                        {
-                            if (fti.WriterClass == null)
-                                throw new InvalidOperationException(string.Format("Writing {0} files not supported", ext));
-
-                            nextStream = (IStream)Activator.CreateInstance(fti.WriterClass);
-                        }
-
-                        // Set the filename of the file reader/writer
-                        SetFileName(nextStream, System.IO.Path.GetFullPath(arg));
-                    }
-                }
-
+                // If failed look for a filter
                 if (nextStream == null)
                 {
                     // Find filter info
@@ -271,7 +228,7 @@ namespace tapetool2
                 }
 
                 // Connect
-                nextStream.SetInput(lastStream);
+                nextStream.SetInput(lastStream, _currentNamespace);
 
                 // Remember the last user generated stream
                 nextToLastStream = lastStream;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [FileWriter("microbee.textBlockStreamWriter", "Text block-stream file writer", "txt", "Text file")]
+    [FileWriter("microbee.textBlockStreamWriter", "Text block-stream file writer", ".blocks.txt")]
     class TextBlockStreamWriter : StreamBase, IBlockStream
     {
         public TextBlockStreamWriter()

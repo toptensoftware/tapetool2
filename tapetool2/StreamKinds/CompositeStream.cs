@@ -10,14 +10,14 @@ namespace tapetool2
         {
         }
 
-        public virtual void SetInput(IStream input)
+        public virtual void SetInput(IStream input, string conversionNamespace)
         {
-            First.SetInput(input);
+            First.SetInput(input, conversionNamespace);
         }
 
         public virtual IEnumerable<IStream> EnumStreams()
         {
-            return Last.EnumStreams();
+            yield return Last;
         }
 
         public void Add(IStream stream)
@@ -25,7 +25,7 @@ namespace tapetool2
             // Connect chain
             if (_chain.Count > 0)
             {
-                stream.SetInput(_chain[_chain.Count - 1]);
+                stream.SetInput(_chain[_chain.Count - 1], null);
             }
 
             // Add to list

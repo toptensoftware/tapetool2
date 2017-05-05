@@ -27,15 +27,26 @@ namespace tapetool2.Microbee
             set { _input = value; }
         }
 
+        bool _skipHeader = true;
+        public bool SkipHeader
+        {
+            get { return _skipHeader; }
+            set { _skipHeader = value; }
+        }
+
         public override void Rewind()
         {
             base.Rewind();
 
-            // Find the header
-            CheckedNext();
-            while (_input.GetByte() != 0x01)
+
+            if (_skipHeader)
             {
+                // Find and skip the header
                 CheckedNext();
+                while (_input.GetByte() != 0x01)
+                {
+                    CheckedNext();
+                }
             }
 
             // Read the header

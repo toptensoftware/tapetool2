@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.SingleBitAudio
 {
-    [FileWriter("singleBitAudioWriter", "Single bit audio file writer", "sba", "Single bit audio stream")]
+    [FileWriter("singleBitAudioWriter", "Single bit audio file writer", "sba")]
     class SingleBitAudioWriter : StreamBase, IAudioStream
     {
         public SingleBitAudioWriter()

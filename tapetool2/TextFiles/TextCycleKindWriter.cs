@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Text
 {
-    [FileWriter("textCycleKindWriter", "Text cycle-kind file writer", "txt", "Text file")]
+    [FileWriter("textCycleKindWriter", "Text cycle-kind file writer", ".cycles.txt")]
     class TextCycleKindWriter : StreamBase, ICycleKindStream
     {
         public TextCycleKindWriter()

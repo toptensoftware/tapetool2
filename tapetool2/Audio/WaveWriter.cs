@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Audio
 {
-    [FileWriter("waveWriter", "Wave file writer", "wav", "Standard wav file")]
+    [FileWriter("waveWriter", "Wave file writer", "wav")]
     class WaveWriter : StreamBase, IAudioStream
     {
         public WaveWriter()

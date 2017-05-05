@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+
+namespace tapetool2.Text
 {
     [FileWriter("textBitStreamWriter", "Text bit-stream file writer", "txt", "Text file")]
-    class FilterTextBitStreamWriter : FilterBitStream
+    class TextBitStreamWriter : StreamBase, IBitStream
     {
-        public FilterTextBitStreamWriter()
+        public TextBitStreamWriter()
         {
         }
 
@@ -21,9 +22,9 @@ namespace tapetool2
             set;
         }
 
-        FilterBitStream _source;
+        IBitStream _source;
         [Source]
-        public FilterBitStream Source
+        public IBitStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -61,12 +62,12 @@ namespace tapetool2
 
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return Source;
         }
 
-        public override bool GetSample()
+        public bool GetSample()
         {
             return _source.GetSample();
         }
@@ -114,4 +115,4 @@ namespace tapetool2
             base.Dispose();
         }
     }
-}
+}     

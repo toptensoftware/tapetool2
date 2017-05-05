@@ -4,20 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeByteEncoder", "Encodes a byte stream into Microbee bit stream")]
-    class FilterByteEncoder : FilterBitStream, IBaudRateProvider
+    [Filter("microbeeBytesToBits", "Encodes a byte stream into Microbee bit stream")]
+    class BytesToBits : StreamBase, IBitStream, IBaudRateProvider
     {
-        public FilterByteEncoder()
+        public BytesToBits()
         {
         }
 
-        FilterByteStream _source;
+        IByteStream _source;
         IBaudRateProvider _sourceBRP;
 
         [Source]
-        public FilterByteStream Source
+        public IByteStream Source
         {
             get { return _source; }
             set
@@ -55,12 +56,12 @@ namespace tapetool2.Microbee
             _state = State.bof;
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override bool GetSample()
+        public bool GetSample()
         {
             switch (_state)
             {

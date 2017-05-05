@@ -17,7 +17,10 @@ namespace tapetool2
         // Convert this stream to another type
         IStream ConvertTo(Type filterType);
 
-        // Set an argument
+        // Get an upstream stream of a particular type
+        IStream UpstreamOfType(Type filterType);
+
+        // Set an argument on the stream
         bool SetArgument(string name, string value);
     }
 }

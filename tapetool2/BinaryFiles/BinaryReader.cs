@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Binary
 {
     [FileReader("binReader", "Binary file reader", "bin", "Binary file")]
-    class FilterBinReader : FilterByteStream
+    class BinaryReader : StreamBase, IByteStream
     {
-        public FilterBinReader()
+        public BinaryReader()
         {
         }
 
@@ -36,13 +36,13 @@ namespace tapetool2
             _stream = File.OpenRead(Filename);
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield break;
         }
 
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             return _currentByte;
         }

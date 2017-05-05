@@ -6,19 +6,14 @@ using System.Threading.Tasks;
 
 namespace tapetool2
 {
-    abstract class Filter : IDisposable
+    abstract class StreamBase : IDisposable
     {
-        public Filter()
+        public StreamBase()
         {
         }
 
 
-        public T ConvertTo<T>() where T : Filter
-        {
-            return (T)ConvertTo(typeof(T));
-        }
-
-        public virtual Filter ConvertTo(Type filterType)
+        public virtual IStream ConvertTo(Type filterType)
         {
             return null;
         }
@@ -31,24 +26,28 @@ namespace tapetool2
                 x.Rewind();
         }
 
-        public virtual T UpstreamOfType<T>() where T:class
+        public virtual IStream UpstreamOfType(Type t)
         {
             foreach (var p in GetPrecedents())
             {
-                // Is it correct type?
-                T pT = p as T;
-                if (pT != null)
-                    return pT;
+                if (t.IsAssignableFrom(p.GetType()))
+                    return p;
 
-                pT = p.UpstreamOfType<T>();
-                if (pT != null)
-                    return pT;
+                var u = p.UpstreamOfType(t);
+                if (u != null)
+                    return u;
             }
 
             return null;
         }
 
-        public abstract IEnumerable<Filter> GetPrecedents();
+        public T UpstreamOfType<T>() where T : class
+        {
+            var us = UpstreamOfType(typeof(T));
+            return (T)us;
+        }
+
+        public abstract IEnumerable<IStream> GetPrecedents();
 
         public abstract bool Next();
 

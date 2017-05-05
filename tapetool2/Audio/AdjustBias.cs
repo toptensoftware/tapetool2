@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [Filter("adjustBias", "Adjusts the audio bias level of an audio stream")]
-    class FilterAudioBiasAdjust : FilterAudio
+    class AdjustBias : StreamBase, IAudioStream
     {
-        public FilterAudioBiasAdjust()
+        public AdjustBias()
         {
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -29,17 +29,17 @@ namespace tapetool2
             set { _amount = value; }
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get { return _source.ChannelCount; }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get { return _source.SampleRate; }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _source.GetSample(channel) + _amount;
         }
@@ -49,12 +49,12 @@ namespace tapetool2
             return _source.Next();
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get { return _source.BitsPerSample; }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }

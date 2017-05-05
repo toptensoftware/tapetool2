@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+
+namespace tapetool2.Text
 {
     [FileWriter("textCycleKindWriter", "Text cycle-kind file writer", "txt", "Text file")]
-    class FilterTextCycleKindWriter : FilterCycleKindStream
+    class TextCycleKindWriter : StreamBase, ICycleKindStream
     {
-        public FilterTextCycleKindWriter()
+        public TextCycleKindWriter()
         {
         }
 
@@ -35,9 +36,9 @@ namespace tapetool2
 
 
 
-        FilterCycleKindStream _source;
+        ICycleKindStream _source;
         [Source]
-        public FilterCycleKindStream Source
+        public ICycleKindStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -63,17 +64,17 @@ namespace tapetool2
 
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return Source;
         }
 
-        public override CycleKind GetCycleKind()
+        public CycleKind GetCycleKind()
         {
             return _source.GetCycleKind();
         }
 
-        public override int GetCurrentBaudRate()
+        public int GetCurrentBaudRate()
         {
             return _source.GetCurrentBaudRate();
         }
@@ -143,4 +144,4 @@ namespace tapetool2
             base.Dispose();
         }
     }
-}
+}     

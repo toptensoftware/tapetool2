@@ -5,18 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [Filter("fir", "Applies a low-pass, high-pass or band-pass filter to an audio stream")]
-    class FilterAudioFir : FilterAudio
+    class Fir : StreamBase, IAudioStream
     {
-        public FilterAudioFir()
+        public Fir()
         {
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -88,12 +88,12 @@ namespace tapetool2
             set { _tapCount = value; }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -101,7 +101,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -109,7 +109,7 @@ namespace tapetool2
             }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -117,7 +117,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return (float)_channelStreams[channel].CurrentSample;
         }

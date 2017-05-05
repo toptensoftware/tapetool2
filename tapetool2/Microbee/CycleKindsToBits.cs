@@ -7,24 +7,20 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    interface ISetUpstreamBaudRate
-    {
-        void SetUpstreamBaudRate(int baudRate);
-    }
 
-    [Filter("microbeeCycleKindParser", "Parses Microbee cycle kinds into a bit stream")]
-    class FilterCycleKindParser : FilterBitStream, ISetUpstreamBaudRate
+    [Filter("microbeeCycleKindsToBits", "Parses Microbee cycle kinds into a bit stream")]
+    class CycleKindsToBits : StreamBase, IBitStream, ISetUpstreamBaudRate
     {
-        public FilterCycleKindParser()
+        public CycleKindsToBits()
         {
         }
 
-        FilterCycleKindStream _source;
+        ICycleKindStream _source;
         IBaudRateProvider _sourceBRP;
 
 
         [Source]
-        public FilterCycleKindStream Source
+        public ICycleKindStream Source
         {
             get { return _source; }
             set
@@ -166,12 +162,12 @@ namespace tapetool2.Microbee
             return leadCycles;
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override bool GetSample()
+        public bool GetSample()
         {
             return _currentBit;
         }
@@ -224,4 +220,4 @@ namespace tapetool2.Microbee
             _upstreamBaudRate = baudRate;
         }
     }
-}
+}     

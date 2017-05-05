@@ -24,10 +24,16 @@ namespace tapetool2
         int BaudRate { get; }
     }
 
-    [StreamKind("cycle kind stream", "cycle kind stream")]
-    abstract class FilterCycleKindStream : Filter
+    interface ISetUpstreamBaudRate
     {
-        public abstract CycleKind GetCycleKind();
-        public abstract int GetCurrentBaudRate();
+        void SetUpstreamBaudRate(int baudRate);
+    }
+
+
+    [StreamKind("cycle kind stream", "cycle kind stream")]
+    interface ICycleKindStream : IStream
+    {
+        CycleKind GetCycleKind();
+        int GetCurrentBaudRate();
     }
 }

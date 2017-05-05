@@ -5,21 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.SingleBitAudio
 {
     [FileWriter("singleBitAudioWriter", "Single bit audio file writer", "sba", "Single bit audio stream")]
-    class FilterSingleBitAudioWriter : FilterAudio
+    class SingleBitAudioWriter : StreamBase, IAudioStream
     {
-        public FilterSingleBitAudioWriter(string filename, FilterAudio source)
+        public SingleBitAudioWriter(string filename, IAudioStream source)
         {
             Filename = filename;
             _source = source;
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
 
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -66,12 +66,12 @@ namespace tapetool2
             _binaryWriter.Write((uint)0);
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -79,7 +79,7 @@ namespace tapetool2
             }
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -87,7 +87,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -95,7 +95,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _source.GetSample(channel);
         }

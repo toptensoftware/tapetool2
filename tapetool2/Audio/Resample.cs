@@ -5,23 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [Filter("resample", "Resamples an audio stream to a new sample rate")]
-    class FilterAudioResample : FilterAudio
+    class Resample : StreamBase, IAudioStream
     {
-        public FilterAudioResample()
+        public Resample()
         {
             _quality = Resampler.Quality.Medium;
             _targetSampleRate = 44100;
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
         int _targetSampleRate;
         Resampler.Quality _quality;
 
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -160,12 +160,12 @@ namespace tapetool2
         }
 
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -173,7 +173,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -181,7 +181,7 @@ namespace tapetool2
             }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -189,7 +189,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return (float)_channelStreams[channel].CurrentSample;
         }

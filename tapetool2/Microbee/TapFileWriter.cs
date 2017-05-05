@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [FileWriter("microbeeTapWriter", "Mirobee tape file writer", "tap", "Microbee tap file")]
-    class FilterTapWriter : FilterByteStream
+    [FileWriter("microbeeTapFileWriter", "Mirobee tape file writer", "tap", "Microbee tap file")]
+    class TapFileWriter : StreamBase, IByteStream
     {
-        public FilterTapWriter()
+        public TapFileWriter()
         {
         }
 
@@ -21,9 +21,9 @@ namespace tapetool2.Microbee
             set;
         }
 
-        FilterByteStream _source;
+        IByteStream _source;
         [Source]
-        public FilterByteStream Source
+        public IByteStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -48,12 +48,12 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return Source;
         }
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             return _source.GetByte();
         }
@@ -81,4 +81,4 @@ namespace tapetool2.Microbee
             base.Dispose();
         }
     }
-}
+}     

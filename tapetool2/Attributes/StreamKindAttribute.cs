@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace tapetool2
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class|AttributeTargets.Interface)]
     public class StreamKindAttribute : Attribute
     {
         public StreamKindAttribute(string name, string description)

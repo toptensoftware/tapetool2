@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeTapStreamEncoder", "Encodes a byte stream into a Microbee tap stream")]
-    class FilterTapStreamEncoder : FilterByteStream, IBaudRateProvider
+    [Filter("microbeeBytesToTap", "Encodes a byte stream into a Microbee tap stream")]
+    class BytesToTap : StreamBase, IByteStream, IBaudRateProvider
     {
-        public FilterTapStreamEncoder()
+        public BytesToTap()
         {
         }
 
-        FilterByteStream _source;
+        IByteStream _source;
         TapeHeader _header;
         State _state;
         int _stateByteCount;
@@ -86,7 +86,7 @@ namespace tapetool2.Microbee
         }
 
         [Source]
-        public FilterByteStream Source
+        public IByteStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -129,7 +129,7 @@ namespace tapetool2.Microbee
             _header.autostart = 0;
 
             // If source is a tap stream, use it's header
-            var upstream = UpstreamOfType<FilterTapStream>();
+            var upstream = UpstreamOfType<ITapStream>();
             if (upstream!=null)
             {
                 _header = upstream.Header;
@@ -169,7 +169,7 @@ namespace tapetool2.Microbee
             _state = State.bof;
         }
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             switch (_state)
             {
@@ -191,7 +191,7 @@ namespace tapetool2.Microbee
             throw new InvalidOperationException();
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }

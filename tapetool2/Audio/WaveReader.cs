@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [FileReader("waveReader", "Wave file reader", "wav", "Standard wav file")]
-    class FilterWaveReader : FilterAudio
+    class WaveReader : StreamBase, IAudioStream
     {
-        public FilterWaveReader()
+        public WaveReader()
         {
         }
 
@@ -148,12 +148,12 @@ namespace tapetool2
             _totalSamples = (uint)((_dataLength / (uint)(_bitsPerSample / 8)) / _channelCount);
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield break;
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -161,7 +161,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -169,7 +169,7 @@ namespace tapetool2
             }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -177,7 +177,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _samples[channel];
         }

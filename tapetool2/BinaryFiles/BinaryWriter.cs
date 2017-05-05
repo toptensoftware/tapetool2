@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Binary
 {
     [FileWriter("binWriter", "Binary file writer", "bin", "Binary file")]
-    class FilterBinWriter : FilterByteStream
+    class BinaryWriter : StreamBase, IByteStream
     {
-        public FilterBinWriter()
+        public BinaryWriter()
         {
         }
 
@@ -21,9 +21,9 @@ namespace tapetool2
             set;
         }
 
-        FilterByteStream _source;
+        IByteStream _source;
         [Source]
-        public FilterByteStream Source
+        public IByteStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -43,12 +43,12 @@ namespace tapetool2
             _stream = File.Create(Filename);
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return Source;
         }
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             return _source.GetByte();
         }

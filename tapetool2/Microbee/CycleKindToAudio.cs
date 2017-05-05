@@ -4,19 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeAudioCycleGenerator", "Generates Microbee audio cycles from a cycle kind stream")]
-    class FilterAudioCycleGenerator : FilterAudio
+    [Filter("microbeeCycleKindToAudio", "Generates Microbee audio cycles from a cycle kind stream")]
+    class CycleKindToAudio : StreamBase, IAudioStream
     {
-        public FilterAudioCycleGenerator()
+        public CycleKindToAudio()
         {
         }
 
-        FilterCycleKindStream _source;
+        ICycleKindStream _source;
     
         [Source]
-        public FilterCycleKindStream Source
+        public ICycleKindStream Source
         {
             get { return _source; }
             set
@@ -46,7 +47,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -54,7 +55,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -63,7 +64,7 @@ namespace tapetool2.Microbee
         }
 
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -81,7 +82,7 @@ namespace tapetool2.Microbee
             _currentSampleNumber = 0xFFFFFFFF;
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
@@ -89,7 +90,7 @@ namespace tapetool2.Microbee
         const double highCycleTime = 1.0 / 2400;
         const double lowCycleTime = 1.0 / 1200;
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _currentSample ? _volume : -_volume;
         }

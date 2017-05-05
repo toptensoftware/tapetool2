@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.SingleBitAudio
 {
     [FileReader("singleBitAudioReader", "Single bit audio file reader", "sba", "Single bit audio stream")]
-    class FilterSingleBitAudioReader : FilterAudio
+    class SingleBitAudioReader : StreamBase, IAudioStream
     {
-        public FilterSingleBitAudioReader()
+        public SingleBitAudioReader()
         {
         }
 
@@ -69,12 +69,12 @@ namespace tapetool2
         byte _unreadBits;
         int _unreadBitCount;
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield break;
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -82,7 +82,7 @@ namespace tapetool2
             }
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -90,7 +90,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -98,7 +98,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return (_unreadBits & 0x01)!= 0 ? _highLevel : _lowLevel;
         }

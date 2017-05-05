@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [FileReader("microbeeTapReader", "Microbee tape file reader", "tap", "Microbee tap file")]
-    class FilterTapReader : FilterByteStream
+    [FileReader("microbeeTapFileReader", "Microbee tape file reader", "tap", "Microbee tap file")]
+    class TapFileReader : StreamBase, IByteStream
     {
-        public FilterTapReader()
+        public TapFileReader()
         {
         }
 
@@ -43,12 +43,12 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield break;
         }
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             return _currentByte;
         }
@@ -76,48 +76,50 @@ namespace tapetool2.Microbee
             base.Dispose();
         }
 
+        /*
         public override Filter ConvertTo(Type filterType)
         {
-            if (filterType == typeof(FilterTapStream))
+            if (filterType == typeof(ITapStream))
             {
                 var s1 = new FilterTapStreamDecoder();
                 s1.Source = this;
                 return s1;
             }
 
-            if (filterType == typeof(FilterBitStream))
+            if (filterType == typeof(IBitStream))
             {
                 // Decode and re-encode so that we can pick up the speed
                 // setting from the header and use it in later cycle rendering
                 var s1 = new FilterTapStreamDecoder();
                 s1.Source = this;
-                var s2 = new FilterTapStreamEncoder();
+                var s2 = new ITapStreamEncoder();
                 s2.Source = s1;
 
                 // Encode bytes to bits
                 var s3 = new FilterByteEncoder();
                 s3.Source = s2;
 
-                return (FilterBitStream)s3;
+                return (IBitStream)s3;
             }
 
-            if (filterType == typeof(FilterCycleKindStream))
+            if (filterType == typeof(ICycleKindStream))
             {
                 // Encode bits to cycle kinds
                 var s4 = new FilterCycleKindGenerator();
-                s4.Source = ConvertTo<FilterBitStream>();
-                return (FilterCycleKindStream)s4;
+                s4.Source = ConvertTo<IBitStream>();
+                return (ICycleKindStream)s4;
             }
 
             if (filterType == typeof(FilterAudio))
             {
                 // Render cycle kinds as audio samples
                 var s5 = new FilterAudioCycleGenerator();
-                s5.Source = ConvertTo<FilterCycleKindStream>();
+                s5.Source = ConvertTo<ICycleKindStream>();
                 return (FilterAudio)s5;
             }
 
             return null;
         }
+        */
     }
 }

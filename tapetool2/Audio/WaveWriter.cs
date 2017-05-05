@@ -5,19 +5,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [FileWriter("waveWriter", "Wave file writer", "wav", "Standard wav file")]
-    class FilterWaveWriter : FilterAudio
+    class WaveWriter : StreamBase, IAudioStream
     {
-        public FilterWaveWriter()
+        public WaveWriter()
         {
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
 
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -106,12 +106,12 @@ namespace tapetool2
         }
 
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get
             {
@@ -119,7 +119,7 @@ namespace tapetool2
             }
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get
             {
@@ -127,7 +127,7 @@ namespace tapetool2
             }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get
             {
@@ -135,7 +135,7 @@ namespace tapetool2
             }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _source.GetSample(channel);
         }

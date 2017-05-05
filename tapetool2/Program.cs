@@ -15,13 +15,13 @@ namespace tapetool2
         static void ShowLogo()
         {
             // Show some help
-            Console.WriteLine("tapetool22 v{0}.{1} - Microbee/TRS-80 Tape Diagnotic Utility", verMajor, verMinor);
+            Console.WriteLine("tapetool2 v{0}.{1} - Microbee/TRS-80 Tape Diagnotic Utility", verMajor, verMinor);
             Console.WriteLine("Copyright (C) 2017 Topten Software.\n");
         }
 
         static void ShowUsage()
         {
-            Console.WriteLine("Usage: tapetool22 [filters...]");
+            Console.WriteLine("Usage: tapetool2 [filters...]");
 
             Console.WriteLine("\nFile Types:");
             foreach (var i in FileTypeInfo.SupportedFileTypes)
@@ -52,10 +52,10 @@ namespace tapetool2
 
         }
 
-        static void ShowFilterHelp(Filter filter)
+        static void ShowFilterHelp(IStream stream)
         {
             // Get the filter info
-            FilterInfo fi = FilterInfo.SupportedFilters.FirstOrDefault(x => x.Type == filter.GetType());
+            FilterInfo fi = FilterInfo.SupportedFilters.FirstOrDefault(x => x.Type == stream.GetType());
 
             Console.WriteLine("{0} - {1}", fi.Name, fi.Description);
 
@@ -85,53 +85,41 @@ namespace tapetool2
             Console.WriteLine();
         }
 
-        static FilterAudio ConvertToAudio(Filter other)
-        {
-            // Already audio?
-            if (other is FilterAudio)
-                return (FilterAudio)other;
-
-            throw new InvalidOperationException(string.Format("Don't know how to convert from {0} to audio", other.GetType().Name));
-        }
-
-        public static void SetFileName(Filter filter, string filename)
+        public static void SetFileName(IStream stream, string filename)
         {
             // Find the filename property
-            var prop = filter.GetType().GetProperties().FirstOrDefault(x => x.Name == "Filename");
+            var prop = stream.GetType().GetProperties().FirstOrDefault(x => x.Name == "Filename");
             if (prop == null)
                 throw new InvalidOperationException("Filter doesn't support Filename property??");
 
             // Set it
-            prop.SetValue(filter, filename);
+            prop.SetValue(stream, filename);
         }
 
-        public static void SetSource(Filter filter, Filter source)
+        public static void ConnectStreams(IStream target, IStream source)
         {
             // Find the source property
-            var prop = filter.GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<SourceAttribute>().Any());
+            var prop = target.GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<SourceAttribute>().Any());
 
             if (source != null)
             {
                 if (prop == null)
-                    throw new InvalidOperationException(string.Format("{0} doesn't have a source property and must be the first in the chain", filter.GetType().Name));
-
-                if (prop.PropertyType == typeof(FilterAudio))
-                {
-                    source = ConvertToAudio(source);
-                }
+                    throw new InvalidOperationException(string.Format("{0} doesn't have a source property and must be the first in the chain", target.GetType().Name));
 
                 if (!prop.PropertyType.IsAssignableFrom(source.GetType()))
                 {
-                    throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2})", filter.GetType().Name, source.GetType().Name, prop.PropertyType.Name));
+                    var converted = source.ConvertTo(prop.PropertyType);
+                    if (converted == null)
+                        throw new InvalidOperationException(string.Format("{0} can't accept an input of type {1} (expects {2})", target.GetType().Name, source.GetType().Name, prop.PropertyType.Name));
                 }
 
                 // Assign it
-                prop.SetValue(filter, source);
+                prop.SetValue(target, source);
             }
         }
 
-        static Filter lhsFilter;
-        static Filter firstFilter;
+        static IStream lhsStream;
+        static IStream firstStream;
         static bool showFilterHelp;
 
         static void ProcessArg(string arg)
@@ -179,9 +167,9 @@ namespace tapetool2
                 }
 
                 // Pass to filter?
-                if (lhsFilter != null)
+                if (lhsStream != null)
                 {
-                    if (lhsFilter.SetArgument(SwitchName, Value))
+                    if (lhsStream.SetArgument(SwitchName, Value))
                         return;
                 }
 
@@ -190,7 +178,7 @@ namespace tapetool2
                 {
                     case "h":
                     case "help":
-                        if (lhsFilter != null)
+                        if (lhsStream != null)
                         {
                             showFilterHelp = true;
                         }
@@ -209,7 +197,7 @@ namespace tapetool2
             }
             else
             {
-                Filter nextFilter;
+                IStream nextStream;
 
                 // Is it a file name?
                 var rdot = arg.LastIndexOf('.');
@@ -222,23 +210,23 @@ namespace tapetool2
                         throw new InvalidOperationException(string.Format("Unsupported file type: {0}", ext));
                     }
 
-                    if (lhsFilter == null)
+                    if (lhsStream == null)
                     {
                         if (fti.ReaderClass == null)
                             throw new InvalidOperationException(string.Format("Reading {0} files not supported", ext));
 
-                        nextFilter = (Filter)Activator.CreateInstance(fti.ReaderClass);
+                        nextStream = (IStream)Activator.CreateInstance(fti.ReaderClass);
                     }
                     else
                     {
                         if (fti.WriterClass == null)
                             throw new InvalidOperationException(string.Format("Writing {0} files not supported", ext));
 
-                        nextFilter = (Filter)Activator.CreateInstance(fti.WriterClass);
+                        nextStream = (IStream)Activator.CreateInstance(fti.WriterClass);
                     }
 
                     // Set the filename of the file reader/writer
-                    SetFileName(nextFilter, System.IO.Path.GetFullPath(arg));
+                    SetFileName(nextStream, System.IO.Path.GetFullPath(arg));
                 }
                 else
                 {
@@ -249,32 +237,20 @@ namespace tapetool2
                         throw new InvalidOperationException(string.Format("Unknown filter type: {0}", arg));
                     }
 
-                    /*
-                    // Asking for help?
-                    if (i + 1 < args.Length)
-                    {
-                        if (args[i+1] == "-h" || args[i+1] == "--help")
-                        {
-                            ShowFilterHelp(fi);
-                            return 0;
-                        }
-                    }
-                    */
-
                     // Create instance
-                    nextFilter = (Filter)Activator.CreateInstance(fi.Type);
+                    nextStream = (IStream)Activator.CreateInstance(fi.Type);
                 }
 
-                SetSource(nextFilter, lhsFilter);
-                lhsFilter = nextFilter;
-                if (firstFilter == null)
-                    firstFilter = lhsFilter;
+                ConnectStreams(nextStream, lhsStream);
+                lhsStream = nextStream;
+                if (firstStream == null)
+                    firstStream = lhsStream;
             }
         }
 
         static int Main(string[] args)
         {
-            lhsFilter = null;
+            lhsStream = null;
 
             for (int i=0; i < args.Length; i++)
             {
@@ -285,12 +261,12 @@ namespace tapetool2
             if (showFilterHelp)
             {
                 ShowLogo();
-                ShowFilterHelp(firstFilter);
+                ShowFilterHelp(firstStream);
                 return 0;
             }
 
             // Nothing to do?
-            if (lhsFilter == null)
+            if (lhsStream == null)
             {
                 ShowLogo();
                 ShowUsage();
@@ -298,16 +274,16 @@ namespace tapetool2
             }
 
             // Dispose filters
-            lhsFilter.Rewind();
+            lhsStream.Rewind();
 
             // Process filter until done
-            while (lhsFilter.Next())
+            while (lhsStream.Next())
             {
                 // nop
             }
 
             // Dispose filters
-            lhsFilter.Dispose();
+            lhsStream.Dispose();
 
             return 0;
         }

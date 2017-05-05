@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 namespace tapetool2.Microbee
 {
     [Filter("microbeeTapStreamDecoder", "Decodes a Microbee tap byte stream")]
-    class FilterTapStreamDecoder : FilterTapStream
+    class FilterTapStreamDecoder : ITapStream
     {
         public FilterTapStreamDecoder()
         {
         }
 
-        FilterByteStream _source;
+        IByteStream _source;
         TapeHeader _header;
         ushort _blockAddress;
 
         [Source]
-        public FilterByteStream Source
+        public IByteStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -77,7 +77,7 @@ namespace tapetool2.Microbee
             return _currentBlock;
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
@@ -139,7 +139,7 @@ using System.Threading.Tasks;
 namespace tapetool2.Microbee
 {
     [StreamKind("Microbee tap stream", "Microbee tap stream")]
-    abstract class FilterTapStream : Filter
+    abstract class ITapStream : Filter
     {
         public abstract TapeHeader Header
         {

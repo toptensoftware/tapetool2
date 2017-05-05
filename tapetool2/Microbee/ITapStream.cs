@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace tapetool2.Microbee
 {
     [StreamKind("Microbee tap stream", "Microbee tap stream")]
-    abstract class FilterTapStream : FilterByteStream
+    interface ITapStream : IByteStream
     {
-        public abstract TapeHeader Header
+        TapeHeader Header
         {
             get;
         }

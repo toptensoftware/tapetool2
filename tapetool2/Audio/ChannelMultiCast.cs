@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [Filter("channelMultiCast", "Multicasts a single audio channel to multiple identical channels")]
-    class FilterAudioChannelMultiCast : FilterAudio
+    class ChannelMultiCast : StreamBase, IAudioStream
     {
-        public FilterAudioChannelMultiCast()
+        public ChannelMultiCast()
         {
             _channels = 2;
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
         int _channels;
 
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -31,17 +31,17 @@ namespace tapetool2
             set { _channels = value; }
         }
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get { return _channels; }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get { return _source.SampleRate; }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             return _source.GetSample(0);
         }
@@ -51,12 +51,12 @@ namespace tapetool2
             return _source.Next();
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get { return _source.BitsPerSample; }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }

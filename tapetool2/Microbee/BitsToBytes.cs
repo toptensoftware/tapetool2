@@ -5,23 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeByteDecoder", "Decodes a Microbee bit stream into byte stream")]
-    class FilterByteDecoder : FilterByteStream, ISetUpstreamBaudRate
+    [Filter("microbeeBitsToBytes", "Decodes a Microbee bit stream into byte stream")]
+    class BitsToBytes : StreamBase, IByteStream, ISetUpstreamBaudRate
     {
-        public FilterByteDecoder()
+        public BitsToBytes()
         {
         }
 
-        FilterBitStream _source;
+        IBitStream _source;
         byte _currentByte;
         byte[] _leadBytes;
         int _leadByteCount;
         int _leadBytesSent;
 
         [Source]
-        public FilterBitStream Source
+        public IBitStream Source
         {
             get { return _source; }
             set { _source = value; }
@@ -133,12 +134,12 @@ namespace tapetool2.Microbee
             throw new InvalidDataException("Invalid bit pattern while decoding bytes");
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override byte GetByte()
+        public byte GetByte()
         {
             if (_leadBytesSent < _leadByteCount)
                 return _leadBytes[_leadBytesSent];
@@ -171,3 +172,4 @@ namespace tapetool2.Microbee
         }
     }
 }
+

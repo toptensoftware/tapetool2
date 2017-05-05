@@ -4,36 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     [Filter("mono", "Mixes a multi-channel audio stream to mono")]
-    class FilterAudioMono : FilterAudio
+    class Mono : StreamBase, IAudioStream
     {
-        public FilterAudioMono()
+        public Mono()
         {
         }
 
-        FilterAudio _source;
+        IAudioStream _source;
 
         [Source]
-        public FilterAudio Source
+        public IAudioStream Source
         {
             get { return _source; }
             set { _source = value; }
         }
 
 
-        public override int ChannelCount
+        public int ChannelCount
         {
             get { return 1; }
         }
 
-        public override int SampleRate
+        public int SampleRate
         {
             get { return _source.SampleRate; }
         }
 
-        public override float GetSample(int channel)
+        public float GetSample(int channel)
         {
             double total = 0;
 
@@ -50,12 +50,12 @@ namespace tapetool2
             return _source.Next();
         }
 
-        public override int BitsPerSample
+        public int BitsPerSample
         {
             get { return _source.BitsPerSample; }
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }

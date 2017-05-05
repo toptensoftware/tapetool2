@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    [Filter("microbeeCycleKindGenerator", "Generates Microbee cycle kinds from a bit stream")]
-    class FilterCycleKindGenerator : FilterCycleKindStream
+    [Filter("microbeeBitsToCycleKinds", "Generates Microbee cycle kinds from a bit stream")]
+    class BitsToCycleKinds : StreamBase, ICycleKindStream
     {
-        public FilterCycleKindGenerator()
+        public BitsToCycleKinds()
         {
         }
 
-        FilterBitStream _source;
+        IBitStream _source;
         IBaudRateProvider _sourceBRP;
 
         [Source]
-        public FilterBitStream Source
+        public IBitStream Source
         {
             get { return _source; }
             set
@@ -64,17 +64,17 @@ namespace tapetool2.Microbee
             _state = State.startBit;
         }
 
-        public override IEnumerable<Filter> GetPrecedents()
+        public override IEnumerable<IStream> GetPrecedents()
         {
             yield return _source;
         }
 
-        public override int GetCurrentBaudRate()
+        public int GetCurrentBaudRate()
         {
             return ResolveBaudRate();
         }
 
-        public override CycleKind GetCycleKind()
+        public CycleKind GetCycleKind()
         {
             return _cycleKind;
         }

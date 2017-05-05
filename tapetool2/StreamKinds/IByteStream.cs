@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace tapetool2
 {
     [StreamKind("byte stream", "byte stream")]
-    abstract class FilterByteStream : Filter
+    interface IByteStream : IStream
     {
-        public abstract byte GetByte();
+        byte GetByte();
     }
 }

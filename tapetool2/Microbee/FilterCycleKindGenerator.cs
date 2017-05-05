@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Microbee
 {
-    interface IBaudRateProvider
-    {
-        int BaudRate { get; }
-    }
-
     [Filter("microbeeCycleKindGenerator", "Generates Microbee cycle kinds from a bit stream")]
     class FilterCycleKindGenerator : FilterCycleKindStream
     {
@@ -74,6 +69,11 @@ namespace tapetool2.Microbee
             yield return _source;
         }
 
+        public override int GetCurrentBaudRate()
+        {
+            return ResolveBaudRate();
+        }
+
         public override CycleKind GetCycleKind()
         {
             return _cycleKind;
@@ -88,11 +88,6 @@ namespace tapetool2.Microbee
                 return 300;
 
             int rate = _sourceBRP.BaudRate;
-
-            if (rate == 1200)
-            {
-                int x = 3;
-            }
 
             return rate;
         }

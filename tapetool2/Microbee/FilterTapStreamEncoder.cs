@@ -29,8 +29,9 @@ namespace tapetool2.Microbee
             bof,
             leadIn,
             header,
-            checksum,
+            headerChecksum,
             block,
+            blockChecksum,
         }
 
         // These properties override the values from source tap stream
@@ -98,6 +99,7 @@ namespace tapetool2.Microbee
                 switch (_state)
                 {
                     case State.block:
+                    case State.blockChecksum:
                         switch (_header.speed)
                         {
                             default:
@@ -180,7 +182,8 @@ namespace tapetool2.Microbee
                 case State.block:
                     return _source.GetByte();
 
-                case State.checksum:
+                case State.headerChecksum:
+                case State.blockChecksum:
                     return (byte)(0x100 - _byteSum);
 
             }
@@ -225,12 +228,13 @@ namespace tapetool2.Microbee
                     _stateByteIndex++;
                     if (_stateByteIndex == _stateByteCount)
                     {
-                        _state = State.checksum;
+                        _state = State.headerChecksum;
                         _blockAddress = 0;
                     }
                     return true;
 
-                case State.checksum:
+                case State.headerChecksum:
+                case State.blockChecksum:
                     // EOF?
                     if (_blockAddress > _header.datalen)
                     {
@@ -253,7 +257,7 @@ namespace tapetool2.Microbee
 
                     if (_stateByteIndex == _stateByteCount)
                     {
-                        _state = State.checksum;
+                        _state = State.blockChecksum;
                         _blockAddress += 0x100;
                     }
                     else

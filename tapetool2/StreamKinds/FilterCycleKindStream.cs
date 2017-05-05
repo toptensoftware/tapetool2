@@ -19,9 +19,15 @@ namespace tapetool2
         TooLow,
     }
 
+    interface IBaudRateProvider
+    {
+        int BaudRate { get; }
+    }
+
     [StreamKind("cycle kind stream", "cycle kind stream")]
     abstract class FilterCycleKindStream : Filter
     {
         public abstract CycleKind GetCycleKind();
+        public abstract int GetCurrentBaudRate();
     }
 }

@@ -47,6 +47,7 @@ namespace tapetool2
         uint _grouping = 0;
         uint _position = 0xFFFFFFFF;
         uint _perLine = 80;
+        int _prevBaudRate = 0;
 
         public override void Rewind()
         {
@@ -58,6 +59,7 @@ namespace tapetool2
             _tw = new StreamWriter(Filename);
             _tw.WriteLine("[cycle kinds]");
             _position = 0xFFFFFFFF;
+            _prevBaudRate = 0;
 
         }
 
@@ -71,12 +73,24 @@ namespace tapetool2
             return _source.GetCycleKind();
         }
 
+        public override int GetCurrentBaudRate()
+        {
+            return _source.GetCurrentBaudRate();
+        }
+
         public override bool Next()
         {
             if (!_source.Next())
             {
                 _tw.WriteLine("\n\n[EOF]");
                 return false;
+            }
+
+            var br = _source.GetCurrentBaudRate();
+            if (br != _prevBaudRate)
+            {
+                _tw.Write("[baud:{0}]", br);
+                _prevBaudRate = br;
             }
 
             _position++;

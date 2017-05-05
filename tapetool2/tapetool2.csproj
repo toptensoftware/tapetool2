@@ -98,6 +98,7 @@
     <Compile Include="Dsp\Resampler.cs" />
     <Compile Include="Audio\WaveUtils.cs" />
     <Compile Include="Utils\CommandLine.cs" />
+    <Compile Include="Utils\Glob.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

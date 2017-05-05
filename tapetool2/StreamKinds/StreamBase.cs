@@ -44,13 +44,13 @@ namespace tapetool2
         public virtual void Rewind()
         {
             // Rewind input filter too
-            foreach (var x in GetInputs())
+            foreach (var x in EnumStreams())
                 x.Rewind();
         }
 
         public virtual IStream UpstreamOfType(Type t)
         {
-            foreach (var p in GetInputs())
+            foreach (var p in EnumStreams())
             {
                 if (t.IsAssignableFrom(p.GetType()))
                     return p;
@@ -69,14 +69,14 @@ namespace tapetool2
             return (T)us;
         }
 
-        public abstract IEnumerable<IStream> GetInputs();
+        public abstract IEnumerable<IStream> EnumStreams();
 
         public abstract bool Next();
 
         public virtual void Dispose()
         {
             // Also dispose source
-            foreach (var x in GetInputs())
+            foreach (var x in EnumStreams())
                 x.Dispose();
         }
 

@@ -134,7 +134,7 @@ namespace tapetool2.Microbee
             throw new InvalidDataException("Invalid bit pattern while decoding bytes");
         }
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return _input;
         }

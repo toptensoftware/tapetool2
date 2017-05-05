@@ -16,7 +16,7 @@ namespace tapetool2
 
         // Get the default input stream for this stream
         void SetInput(IStream stream);
-        IEnumerable<IStream> GetInputs();
+        IEnumerable<IStream> EnumStreams();
 
         // Get an upstream stream of a particular type
         IStream UpstreamOfType(Type filterType);

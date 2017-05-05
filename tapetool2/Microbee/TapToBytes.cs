@@ -95,7 +95,7 @@ namespace tapetool2.Microbee
             return _input.GetByte();
         }
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return _input;
         }

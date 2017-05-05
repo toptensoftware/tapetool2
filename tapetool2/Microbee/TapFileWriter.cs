@@ -48,7 +48,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return Input;
         }

@@ -160,7 +160,7 @@ namespace tapetool2.Audio
         }
 
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return _input;
         }

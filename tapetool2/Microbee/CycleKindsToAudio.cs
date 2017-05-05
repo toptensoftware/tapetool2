@@ -82,7 +82,7 @@ namespace tapetool2.Microbee
             _currentSampleNumber = 0xFFFFFFFF;
         }
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return _input;
         }

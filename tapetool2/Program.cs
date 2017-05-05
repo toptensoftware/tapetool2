@@ -106,12 +106,29 @@ namespace tapetool2
 
         static void ShowChain(IStream stm)
         {
-            foreach (var inp in stm.GetInputs())
+            foreach (var inp in stm.EnumStreams())
                 ShowChain(inp);
             Console.WriteLine("{0}", FilterInfo.NameOfFilter(stm));
         }
 
+        static bool SetArgument(IStream stopPos, IStream stm, string name, string value)
+        {
+            if (stm == stopPos)
+                return false;
 
+            if (stm.SetArgument(name, value))
+                return true;
+
+            foreach (var p in stm.EnumStreams())
+            {
+                if (SetArgument(stopPos, p, name, value))
+                    return true;
+            }
+
+            return false;
+        }
+
+        static IStream nextToLastStream;
         static IStream lastStream;
         static IStream firstStream;
         static bool showFilterHelp;
@@ -164,7 +181,7 @@ namespace tapetool2
                 // Pass to filter?
                 if (lastStream != null)
                 {
-                    if (lastStream.SetArgument(SwitchName, Value))
+                    if (SetArgument(nextToLastStream, lastStream, SwitchName, Value))
                         return;
                 }
 
@@ -253,7 +270,13 @@ namespace tapetool2
                     nextStream = (IStream)Activator.CreateInstance(fi.Type);
                 }
 
+                // Connect
                 nextStream.SetInput(lastStream);
+
+                // Remember the last user generated stream
+                nextToLastStream = lastStream;
+                
+                // Update chain
                 lastStream = nextStream;
                 if (firstStream == null)
                     firstStream = lastStream;

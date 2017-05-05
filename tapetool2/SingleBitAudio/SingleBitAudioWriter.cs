@@ -65,7 +65,7 @@ namespace tapetool2.SingleBitAudio
             _binaryWriter.Write((uint)0);
         }
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield return _input;
         }

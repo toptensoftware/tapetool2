@@ -15,9 +15,9 @@ namespace tapetool2
             First.SetInput(input);
         }
 
-        public virtual IEnumerable<IStream> GetInputs()
+        public virtual IEnumerable<IStream> EnumStreams()
         {
-            return First.GetInputs();
+            return Last.EnumStreams();
         }
 
         public void Add(IStream stream)
@@ -61,11 +61,13 @@ namespace tapetool2
 
         public virtual bool SetArgument(string name, string value)
         {
+            /*
             for (int i = _chain.Count - 1; i >= 0; i--)
             {
                 if (_chain[i].SetArgument(name, value))
                     return true;
             }
+            */
             return false;
         }
 

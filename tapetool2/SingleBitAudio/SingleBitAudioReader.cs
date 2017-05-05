@@ -70,7 +70,7 @@ namespace tapetool2.SingleBitAudio
         byte _unreadBits;
         int _unreadBitCount;
 
-        public override IEnumerable<IStream> GetInputs()
+        public override IEnumerable<IStream> EnumStreams()
         {
             yield break;
         }

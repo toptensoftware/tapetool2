@@ -36,7 +36,7 @@ namespace tapetool2.Binary
             _stream = File.OpenRead(Filename);
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield break;
         }

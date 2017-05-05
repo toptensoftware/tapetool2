@@ -70,7 +70,7 @@ namespace tapetool2.Text
 
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return Input;
         }

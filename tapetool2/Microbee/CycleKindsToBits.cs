@@ -16,7 +16,6 @@ namespace tapetool2.Microbee
         }
 
         ICycleKindStream _input;
-        IBaudRateProvider _sourceBRP;
 
 
         [InputStream]
@@ -26,7 +25,6 @@ namespace tapetool2.Microbee
             set
             {
                 _input = value;
-                _sourceBRP = _input as IBaudRateProvider;
             }
         }
 
@@ -162,7 +160,7 @@ namespace tapetool2.Microbee
             return leadCycles;
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

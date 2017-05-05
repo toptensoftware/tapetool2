@@ -88,7 +88,7 @@ namespace tapetool2.Audio
             set { _tapCount = value; }
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

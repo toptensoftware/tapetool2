@@ -58,7 +58,7 @@ namespace tapetool2.Audio
             get { return _input.BitsPerSample; }
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

@@ -26,7 +26,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        int _sampleRate = 24000;
+        int _sampleRate = 19200;
         float _volume = 0.75f;
 
         [FilterOption("sampleRate", "sample rate at which to render")]
@@ -82,7 +82,7 @@ namespace tapetool2.Microbee
             _currentSampleNumber = 0xFFFFFFFF;
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

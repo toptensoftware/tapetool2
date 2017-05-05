@@ -14,6 +14,7 @@ namespace tapetool2.SingleBitAudio
         {
         }
 
+        [FilterOption("filename", "The file to write", IsFileName = true)]
         public string Filename
         {
             get;
@@ -69,7 +70,7 @@ namespace tapetool2.SingleBitAudio
         byte _unreadBits;
         int _unreadBitCount;
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield break;
         }

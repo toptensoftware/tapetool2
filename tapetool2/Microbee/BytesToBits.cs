@@ -56,7 +56,7 @@ namespace tapetool2.Microbee
             _state = State.bof;
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

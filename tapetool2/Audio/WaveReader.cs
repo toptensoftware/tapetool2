@@ -148,7 +148,7 @@ namespace tapetool2.Audio
             _totalSamples = (uint)((_dataLength / (uint)(_bitsPerSample / 8)) / _channelCount);
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield break;
         }

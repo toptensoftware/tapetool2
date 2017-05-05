@@ -88,5 +88,14 @@ namespace tapetool2
 
             return info;
         }
+
+        public static string NameOfFilter(IStream s)
+        {
+            var attr = s.GetType().GetCustomAttribute<FilterAttribute>();
+            if (attr == null)
+                return s.GetType().Name;
+            else
+                return attr.Name;
+        }
     }
 }

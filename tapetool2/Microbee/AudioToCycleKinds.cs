@@ -47,26 +47,27 @@ namespace tapetool2.Microbee
         // Find the next zero crossing and return the number of samples passed
         int FindZeroCrossing()
         {
-            int samples = -1;
+            int samples = 0;
             float prevSample = _input.GetSample(0);
 
             while (true)
             {
                 if (!_input.Next())
-                    return samples;
+                    return samples == 0 ? -1 : samples;
 
                 var currentSample = _input.GetSample(0);
+
+                samples++;
 
                 if (prevSample <= 0 && currentSample > 0)
                     return samples;
 
                 prevSample = currentSample;
 
-                samples++;
             }
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

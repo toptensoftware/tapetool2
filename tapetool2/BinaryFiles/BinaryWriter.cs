@@ -43,7 +43,7 @@ namespace tapetool2.Binary
             _stream = File.Create(Filename);
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return Input;
         }

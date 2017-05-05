@@ -83,7 +83,7 @@
     <Compile Include="Attributes\FileFilterAttribute.cs" />
     <Compile Include="Attributes\FileReaderAttribute.cs" />
     <Compile Include="Reflection\FileTypeInfo.cs" />
-    <Compile Include="Reflection\FilterAttribute.cs" />
+    <Compile Include="Attributes\FilterAttribute.cs" />
     <Compile Include="Attributes\FileWriterAttribute.cs" />
     <Compile Include="Reflection\FilterInfo.cs" />
     <Compile Include="Microbee\TapFileReader.cs" />

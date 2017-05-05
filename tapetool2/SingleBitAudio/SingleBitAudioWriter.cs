@@ -10,10 +10,8 @@ namespace tapetool2.SingleBitAudio
     [FileWriter("singleBitAudioWriter", "Single bit audio file writer", "sba", "Single bit audio stream")]
     class SingleBitAudioWriter : StreamBase, IAudioStream
     {
-        public SingleBitAudioWriter(string filename, IAudioStream source)
+        public SingleBitAudioWriter()
         {
-            Filename = filename;
-            _input = source;
         }
 
         IAudioStream _input;
@@ -25,6 +23,7 @@ namespace tapetool2.SingleBitAudio
             set { _input = value; }
         }
 
+        [FilterOption("filename", "The file to write", IsFileName = true)]
         public string Filename
         {
             get;
@@ -66,7 +65,7 @@ namespace tapetool2.SingleBitAudio
             _binaryWriter.Write((uint)0);
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

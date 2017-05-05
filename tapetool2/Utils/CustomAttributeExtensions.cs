@@ -19,5 +19,10 @@ namespace tapetool2
             var attr = This.GetCustomAttributes(typeof(T), true).SingleOrDefault();
             return (T)attr;
         }
+        public static T GetCustomAttribute<T>(this Type This)
+        {
+            var attr = This.GetCustomAttributes(typeof(T), true).SingleOrDefault();
+            return (T)attr;
+        }
     }
 }

@@ -15,6 +15,11 @@ namespace tapetool2
             First.SetInput(input);
         }
 
+        public virtual IEnumerable<IStream> GetInputs()
+        {
+            return First.GetInputs();
+        }
+
         public void Add(IStream stream)
         {
             // Connect chain

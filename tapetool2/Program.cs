@@ -104,8 +104,15 @@ namespace tapetool2
             prop.SetValue(stream, filename);
         }
 
+        static void ShowChain(IStream stm)
+        {
+            foreach (var inp in stm.GetInputs())
+                ShowChain(inp);
+            Console.WriteLine("{0}", FilterInfo.NameOfFilter(stm));
+        }
 
-        static IStream lhsStream;
+
+        static IStream lastStream;
         static IStream firstStream;
         static bool showFilterHelp;
         static string _currentNamespace;
@@ -155,9 +162,9 @@ namespace tapetool2
                 }
 
                 // Pass to filter?
-                if (lhsStream != null)
+                if (lastStream != null)
                 {
-                    if (lhsStream.SetArgument(SwitchName, Value))
+                    if (lastStream.SetArgument(SwitchName, Value))
                         return;
                 }
 
@@ -166,7 +173,7 @@ namespace tapetool2
                 {
                     case "h":
                     case "help":
-                        if (lhsStream != null)
+                        if (lastStream != null)
                         {
                             showFilterHelp = true;
                         }
@@ -210,7 +217,7 @@ namespace tapetool2
                     }
                     else
                     {
-                        if (lhsStream == null)
+                        if (lastStream == null)
                         {
                             if (fti.ReaderClass == null)
                                 throw new InvalidOperationException(string.Format("Reading {0} files not supported", ext));
@@ -246,57 +253,65 @@ namespace tapetool2
                     nextStream = (IStream)Activator.CreateInstance(fi.Type);
                 }
 
-                nextStream.SetInput(lhsStream);
-                lhsStream = nextStream;
+                nextStream.SetInput(lastStream);
+                lastStream = nextStream;
                 if (firstStream == null)
-                    firstStream = lhsStream;
+                    firstStream = lastStream;
             }
         }
 
         static int Main(string[] args)
         {
-            lhsStream = null;
-
-            for (int i=0; i < args.Length; i++)
+            try
             {
-                ProcessArg(args[i]);
-            }
+                lastStream = null;
+                for (int i=0; i < args.Length; i++)
+                {
+                    ProcessArg(args[i]);
+                }
 
-            // Show help for the first filter?
-            if (showFilterHelp)
-            {
-                ShowLogo();
-                ShowFilterHelp(firstStream);
+                // Show help for the first filter?
+                if (showFilterHelp)
+                {
+                    ShowLogo();
+                    ShowFilterHelp(firstStream);
+                    return 0;
+                }
+
+                // Nothing to do?
+                if (lastStream == null)
+                {
+                    ShowLogo();
+                    ShowUsage();
+                    return 0;
+                }
+
+                ShowChain(lastStream);
+
+                using (lastStream)
+                {
+                    // Dispose filters
+                    lastStream.Rewind();
+
+                    // Process filter until done
+                    while (lastStream.Next())
+                    {
+                        // nop
+                    }
+                }
+
                 return 0;
             }
-
-            // Nothing to do?
-            if (lhsStream == null)
+            catch (Exception x)
             {
-                ShowLogo();
-                ShowUsage();
-                return 0;
+                Console.WriteLine();
+                Console.WriteLine(x.Message);
+
+                if (System.Diagnostics.Debugger.IsAttached)
+                    throw;
+
+                return 7;
             }
-
-            // Dispose filters
-            lhsStream.Rewind();
-
-            // Process filter until done
-            while (lhsStream.Next())
-            {
-                // nop
-            }
-
-            // Dispose filters
-            lhsStream.Dispose();
-
-            return 0;
         }
     }
-
-    /*
-    tapReader -> tapeByteStream -> byteToCycleGenerator -> cycleToBitStream -> bitStreamToAudio -> waveFile
-                                                                            -> tbsFile
-              -> tapeDataParser -> byteStream -> binFile
-    */
 }

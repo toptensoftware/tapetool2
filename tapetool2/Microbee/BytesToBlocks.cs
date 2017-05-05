@@ -94,7 +94,7 @@ namespace tapetool2.Microbee
             return _currentBlock;
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

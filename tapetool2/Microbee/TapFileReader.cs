@@ -43,7 +43,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield break;
         }

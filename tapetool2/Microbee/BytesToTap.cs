@@ -191,7 +191,7 @@ namespace tapetool2.Microbee
             throw new InvalidOperationException();
         }
 
-        public override IEnumerable<IStream> GetPrecedents()
+        public override IEnumerable<IStream> GetInputs()
         {
             yield return _input;
         }

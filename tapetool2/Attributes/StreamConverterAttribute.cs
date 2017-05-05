@@ -13,14 +13,10 @@ namespace tapetool2
         {
         }
 
-        public StreamConverterAttribute(Type targetObjectType)
-        {
-            TargetObjectType = targetObjectType;
-        }
-
         public Type TargetObjectType
         {
-            get; private set;
+            get;
+            set;
         }
     }
 }

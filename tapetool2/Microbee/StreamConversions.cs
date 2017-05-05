@@ -32,7 +32,7 @@ namespace tapetool2.Microbee
             return new ParseAudio() { Input = audio };
         }
 
-        [StreamConverter(typeof(TapFileWriter))]
+        [StreamConverter(TargetObjectType = typeof(TapFileWriter))]
         public static IByteStream ConvertAudioToTapFile(IAudioStream audio)
         {
             return new BlocksToBytes() { Input = new ParseAudio() { Input = audio } };

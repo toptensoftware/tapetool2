@@ -47,6 +47,9 @@
   <ItemGroup>
     <Compile Include="Attributes\StreamConverterAttribute.cs" />
     <Compile Include="Audio\ChangeRate.cs" />
+    <Compile Include="Audio\FirBandPass.cs" />
+    <Compile Include="Audio\FirHighPass.cs" />
+    <Compile Include="Audio\FirLowPass.cs" />
     <Compile Include="BinaryFiles\BinaryReader.cs" />
     <Compile Include="Microbee\BitsToBytes.cs" />
     <Compile Include="Microbee\AudioToCycleKinds.cs" />

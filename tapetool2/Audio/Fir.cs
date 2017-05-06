@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Audio
 {
-    [Filter("fir", "Applies a low-pass, high-pass or band-pass filter to an audio stream")]
     class Fir : StreamBase, IAudioStream
     {
         public Fir()
@@ -22,10 +21,18 @@ namespace tapetool2.Audio
             set { _input = value; }
         }
 
-        int _freqLow = 0;
-        int _freqHigh = 0;
-        int _tapCount = 51;
+        protected int _freqLow = 0;
+        protected int _freqHigh = 0;
+        protected int _tapCount = 51;
         int _tailSamples;
+
+        [FilterOption("taps", "Number of taps in FIR filter")]
+        public int Taps
+        {
+            get { return _tapCount; }
+            set { _tapCount = value; }
+        }
+
 
         class ChannelStream
         {
@@ -65,27 +72,6 @@ namespace tapetool2.Audio
             {
                 ProcessSample();
             }
-        }
-
-        [FilterOption("low", "Low cutoff frequency")]
-        public int Low
-        {
-            get { return _freqLow; }
-            set { _freqLow = value; }
-        }
-
-        [FilterOption("high", "High cutoff frequency")]
-        public int High
-        {
-            get { return _freqHigh; }
-            set { _freqHigh = value; }
-        }
-
-        [FilterOption("taps", "Number of taps in FIR filter")]
-        public int Taps
-        {
-            get { return _tapCount; }
-            set { _tapCount = value; }
         }
 
         public override IEnumerable<IStream> EnumStreams()

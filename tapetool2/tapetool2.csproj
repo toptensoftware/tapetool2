@@ -50,7 +50,9 @@
     <Compile Include="BinaryFiles\BinaryReader.cs" />
     <Compile Include="Microbee\BitsToBytes.cs" />
     <Compile Include="Microbee\AudioToCycleKinds.cs" />
+    <Compile Include="Microbee\UnpackData.cs" />
     <Compile Include="Microbee\BlocksToBytes.cs" />
+    <Compile Include="Microbee\packData.cs" />
     <Compile Include="Microbee\RenderAudio.cs" />
     <Compile Include="Microbee\SetHeader.cs" />
     <Compile Include="Microbee\CycleKindsToAudio.cs" />
@@ -72,10 +74,10 @@
     <Compile Include="StreamKinds\IStream.cs" />
     <Compile Include="StreamKinds\ICycleKindStream.cs" />
     <Compile Include="StreamKinds\IStreamExtensions.cs" />
-    <Compile Include="TextFiles\TextBlockStreamReader.cs" />
+    <Compile Include="Microbee\TextBlockStreamReader.cs" />
     <Compile Include="TextFiles\TextByteStreamReader.cs" />
     <Compile Include="TextFiles\TextBitStreamWriter.cs" />
-    <Compile Include="TextFiles\TextBlockStreamWriter.cs" />
+    <Compile Include="Microbee\TextBlockStreamWriter.cs" />
     <Compile Include="TextFiles\TextByteStreamWriter.cs" />
     <Compile Include="TextFiles\TextBitStreamReader.cs" />
     <Compile Include="TextFiles\TextCycleKindReader.cs" />
@@ -92,7 +94,7 @@
     <Compile Include="Microbee\TapFileReader.cs" />
     <Compile Include="StreamKinds\IByteStream.cs" />
     <Compile Include="StreamKinds\StreamBase.cs" />
-    <Compile Include="Audio\AdjustBias.cs" />
+    <Compile Include="Audio\DCOffset.cs" />
     <Compile Include="Audio\Gain.cs" />
     <Compile Include="StreamKinds\IBitStream.cs" />
     <Compile Include="Audio\SelectChannel.cs" />

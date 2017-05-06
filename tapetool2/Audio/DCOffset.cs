@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Audio
 {
-    [Filter("adjustBias", "Adjusts the audio bias level of an audio stream")]
-    class AdjustBias : StreamBase, IAudioStream
+    [Filter("dcOffset", "Adjusts the DC offset of an audio stream")]
+    class DCOffset : StreamBase, IAudioStream
     {
-        public AdjustBias()
+        public DCOffset()
         {
         }
 

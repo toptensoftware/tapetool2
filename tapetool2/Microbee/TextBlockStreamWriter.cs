@@ -64,6 +64,7 @@ namespace tapetool2.Microbee
             _tw.WriteLine("[");
             _tw.WriteLine("    {0,15}: '{1}'", "filename", _input.Header.filename);
             _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "datalen", _input.Header.datalen, _input.Header.datalen);
+            _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "load address", _input.Header.loadaddr, _input.Header.startaddr);
             _tw.WriteLine("    {0,15}: 0x{1:X4} ({1})", "start address", _input.Header.startaddr, _input.Header.startaddr);
             _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "speed", _input.Header.speed, _input.Header.speed);
             _tw.WriteLine("    {0,15}: 0x{1:X2} ({1})", "autostart", _input.Header.autostart, _input.Header.autostart);

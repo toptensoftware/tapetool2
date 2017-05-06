@@ -128,6 +128,9 @@ namespace tapetool2
 
         public static IStream CreateFileStream(string filename, IStream sourceStream)
         {
+            if (filename.IndexOf('.') < 0)
+                return null;
+
             var fti = ResolveFileTypeFilter(filename, sourceStream);
             if (fti == null)
                 return null;

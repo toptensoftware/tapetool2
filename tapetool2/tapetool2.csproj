@@ -75,6 +75,7 @@
     <Compile Include="Common\StreamConversion.cs" />
     <Compile Include="Common\CompositeStream.cs" />
     <Compile Include="Common\IStream.cs" />
+    <Compile Include="Tape\AudioAnalyser.cs" />
     <Compile Include="Tape\ICycleKindStream.cs" />
     <Compile Include="Common\IStreamExtensions.cs" />
     <Compile Include="Microbee\TextBlockStreamReader.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Binary\TextBitStreamReader.cs" />
     <Compile Include="Tape\TextCycleKindReader.cs" />
     <Compile Include="Tape\TextCycleKindWriter.cs" />
+    <Compile Include="Tape\CycleLengthDetector.cs" />
     <Compile Include="Utils\TextParser.cs" />
     <Compile Include="Utils\BitStreamUtils.cs" />
     <Compile Include="Attributes\StreamKindAttribute.cs" />

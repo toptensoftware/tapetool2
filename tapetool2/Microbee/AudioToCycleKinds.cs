@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace tapetool2.Microbee
         int _samplesPerLowCycle;
         int _sampleMargin;
         int _currentCycleSamples;
+        CycleLengthDetector _cld = new CycleLengthDetector() { Method = CycleLengthMethod.ZeroCrossingDown };
     
         [InputStream]
         public IAudioStream Input
@@ -28,6 +30,15 @@ namespace tapetool2.Microbee
             set
             {
                 _input = value;
+            }
+        }
+        
+        [FilterOption("cycleMethod", "sets the method used to measure cycle lengths (zc+, zc-, duty+ or duty-). Default = zc-")]
+        public string cycleMethod
+        {
+            set
+            {
+                _cld.Method = CycleLengthDetector.ParseMethod(value);
             }
         }
 
@@ -40,32 +51,35 @@ namespace tapetool2.Microbee
             {
             }
 
+            _cld.Reset();
+
             _samplesPerHighCycle = _input.SampleRate / 2400;
             _samplesPerLowCycle = _input.SampleRate / 1200;
-            _sampleMargin = (_samplesPerLowCycle - _samplesPerHighCycle) / 3;
+            _sampleMargin = (_samplesPerLowCycle - _samplesPerHighCycle) / 2 - 1;
+            _eof = false;
+            _invalidCount = 0;
+            _indeterminateCount = 0;
         }
+
+        bool _eof;
+        long _invalidCount;
+        long _indeterminateCount;
+
 
         // Find the next zero crossing and return the number of samples passed
         int FindZeroCrossing()
         {
-            int samples = 0;
-            float prevSample = _input.GetSample(0);
-
-            while (true)
+            if (_eof)
+                return -1;
+            while (_input.Next())
             {
-                if (!_input.Next())
-                    return samples == 0 ? -1 : samples;
-
-                var currentSample = _input.GetSample(0);
-
-                samples++;
-
-                if (prevSample <= 0 && currentSample > 0)
+                int samples = _cld.Update(_input.GetSample(0));
+                if (samples != 0)
                     return samples;
-
-                prevSample = currentSample;
-
             }
+
+            _eof = true;
+            return _cld.CurrentCycleLength();
         }
 
         public override IEnumerable<IStream> EnumStreams()
@@ -86,11 +100,11 @@ namespace tapetool2.Microbee
         {
             if (_currentCycleSamples < _samplesPerHighCycle - _sampleMargin)
                 return CycleKind.TooHigh;
-            if (_currentCycleSamples < _samplesPerHighCycle + _sampleMargin)
+            if (_currentCycleSamples <= _samplesPerHighCycle + _sampleMargin)
                 return CycleKind.High;
             if (_currentCycleSamples < _samplesPerLowCycle - _sampleMargin)
                 return CycleKind.Indeterminate;
-            if (_currentCycleSamples < _samplesPerLowCycle + _sampleMargin)
+            if (_currentCycleSamples <= _samplesPerLowCycle + _sampleMargin)
                 return CycleKind.Low;
             return CycleKind.TooLow;
         }
@@ -98,7 +112,35 @@ namespace tapetool2.Microbee
         protected override bool OnNext()
         {
             _currentCycleSamples = FindZeroCrossing();
-            return _currentCycleSamples >= 0;
+            if (_currentCycleSamples < 0)
+            {
+                return false;
+            }
+                    
+            switch (GetCycleKind())
+            {
+                case CycleKind.Indeterminate:
+                    _indeterminateCount++;
+                    break;
+
+                case CycleKind.TooHigh:
+                case CycleKind.TooLow:
+                    _invalidCount++;
+                    break;
+            }
+
+            return true;
+        }
+
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    cycle method: {0}", _cld.Method.ToString());
+            w.WriteLine("    indeterminate cycles: {0}", _indeterminateCount);
+            w.WriteLine("    invalid cycles: {0}", _invalidCount);
+            w.WriteLine("    short cycle: {0} - {1}", _samplesPerHighCycle - _sampleMargin, _samplesPerHighCycle + _sampleMargin);
+            w.WriteLine("    long cycle:  {0} - {1}", _samplesPerLowCycle - _sampleMargin, _samplesPerLowCycle + _sampleMargin);
+
         }
 
     }

@@ -206,10 +206,8 @@ namespace tapetool2.Audio
                 _channelStreams[i].CalculateSample(_sourceSample);
             }
 
-            //Console.WriteLine("{0,10:N3} - {1,10:N3}", _sourceSample, _channelStreams[0].CurrentSample);
-
             _sourceSample += _invConvRate;
-            return false;
+            return true;
         }
 
     }

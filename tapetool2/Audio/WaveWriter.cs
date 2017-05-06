@@ -206,7 +206,7 @@ namespace tapetool2.Audio
         public override void WriteSummary(TextWriter w)
         {
             base.WriteSummary(w);
-            w.WriteLine("    total Samples: {0}", _totalSamples);
+            w.WriteLine("    total samples: {0}", _totalSamples);
             w.WriteLine("    sample rate: {0}Hz", _input.SampleRate);
             w.WriteLine("    channels: {0}", _input.ChannelCount);
             w.WriteLine("    bits per sample: {0}", _bitsPerSample);

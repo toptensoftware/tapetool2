@@ -153,7 +153,7 @@ namespace tapetool2.SingleBitAudio
         public override void WriteSummary(TextWriter w)
         {
             base.WriteSummary(w);
-            w.WriteLine("    total Samples: {0}", _totalSamples);
+            w.WriteLine("    total samples: {0}", _totalSamples);
             w.WriteLine("    sample rate: {0}Hz", _input.SampleRate);
         }
     }

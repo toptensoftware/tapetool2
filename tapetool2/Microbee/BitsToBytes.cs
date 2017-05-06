@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using tapetool2.Binary;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -146,7 +147,7 @@ namespace tapetool2.Microbee
             return _currentByte;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_leadBytesSent < _leadByteCount)
             {

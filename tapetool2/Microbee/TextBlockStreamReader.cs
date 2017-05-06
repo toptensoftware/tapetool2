@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using tapetool2.Text;
+using tapetool2.Binary;
 
 namespace tapetool2.Microbee
 {

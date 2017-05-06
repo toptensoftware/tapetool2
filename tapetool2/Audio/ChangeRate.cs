@@ -60,7 +60,7 @@ namespace tapetool2.Audio
             return _input.GetSample(channel);
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             return _input.Next();
         }

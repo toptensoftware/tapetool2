@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace tapetool2
@@ -79,6 +80,11 @@ namespace tapetool2
         public virtual void Dispose()
         {
             Last.Dispose();
+        }
+
+        public void WriteSummary(TextWriter w)
+        {
+            w.WriteLine("{0} (composite chain of previous {1} sub-streams)", FilterInfo.NameOfFilter(this as IStream), _chain.Count);
         }
 
     }

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Text
+namespace tapetool2.Binary
 {
     [FileWriter("textBitStreamWriter", "Text bit-stream file writer", ".bits.txt")]
     class TextBitStreamWriter : StreamBase, IBitStream
@@ -72,7 +72,7 @@ namespace tapetool2.Text
             return _input.GetSample();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
             {

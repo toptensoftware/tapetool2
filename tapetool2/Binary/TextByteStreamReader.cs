@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Text
+namespace tapetool2.Binary
 {
     [FileReader("textByteStreamReader", "Text byte-stream file reader", ".bytes.txt")]
     class TextByteStreamReader : StreamBase, IByteStream
@@ -62,7 +62,7 @@ namespace tapetool2.Text
             throw new InvalidOperationException(string.Format("Invalid character in text byte stream ('{0}')", ch));
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             char ch = _parser.Next();
 

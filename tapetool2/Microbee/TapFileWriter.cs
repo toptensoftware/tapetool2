@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
 
 namespace tapetool2.Microbee
 {
@@ -41,7 +42,7 @@ namespace tapetool2.Microbee
 
             // Open source stream
             _stream = File.Create(Filename);
-            using (var br = new BinaryWriter(_stream, Encoding.UTF8, true))
+            using (var br = new System.IO.BinaryWriter(_stream, Encoding.UTF8, true))
             {
                 // Write header
                 br.Write("TAP_DGOS_MBEE".Select(x=>x).ToArray());
@@ -58,7 +59,7 @@ namespace tapetool2.Microbee
             return _input.GetByte();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
                 return false;

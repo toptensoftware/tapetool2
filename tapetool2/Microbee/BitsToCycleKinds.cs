@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -92,7 +94,7 @@ namespace tapetool2.Microbee
             return rate;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             switch (_state)
             {

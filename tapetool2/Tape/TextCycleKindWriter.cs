@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Text
+namespace tapetool2.Tape
 {
     [FileWriter("textCycleKindWriter", "Text cycle-kind file writer", ".cycles.txt")]
     class TextCycleKindWriter : StreamBase, ICycleKindStream
@@ -79,7 +79,7 @@ namespace tapetool2.Text
             return _input.GetCurrentBaudRate();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
             {

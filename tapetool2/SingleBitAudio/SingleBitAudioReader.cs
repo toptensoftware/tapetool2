@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Audio;
 
 namespace tapetool2.SingleBitAudio
 {
@@ -21,8 +22,8 @@ namespace tapetool2.SingleBitAudio
             set;
         }
 
-        float _highLevel;
-        float _lowLevel;
+        float _highLevel = 0.75f;
+        float _lowLevel = -0.75f;
 
         [FilterOption("high", "Audio level for 1 bits (default=0.75)")]
         public float HighLevel
@@ -104,7 +105,7 @@ namespace tapetool2.SingleBitAudio
             return (_unreadBits & 0x01)!= 0 ? _highLevel : _lowLevel;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_currentSample >= _totalSamples)
                 return false;
@@ -138,6 +139,13 @@ namespace tapetool2.SingleBitAudio
         {
             Close();
             base.Dispose();
+        }
+
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    total Samples: {0}", _totalSamples);
+            w.WriteLine("    sample rate: {0}Hz", _sampleRate);
         }
     }
 }

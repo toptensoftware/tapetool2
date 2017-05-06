@@ -98,7 +98,7 @@ namespace tapetool2.Microbee
             return _input.GetBlock();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
             {

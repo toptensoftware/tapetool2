@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -24,8 +26,8 @@ namespace tapetool2.Microbee
         [InputStream]
         public IByteStream Input
         {
-            get { return _input; }
-            set { _input = value; }
+            get { return Input1; }
+            set { Input1 = value; }
         }
 
         public override void Rewind()
@@ -34,7 +36,7 @@ namespace tapetool2.Microbee
 
             // Find the header
             CheckedNext();
-            while (_input.GetByte() != 0x01)
+            while (Input1.GetByte() != 0x01)
             {
                 CheckedNext();
             }
@@ -45,13 +47,13 @@ namespace tapetool2.Microbee
             for (int i = 0; i < 16; i++)
             {
                 CheckedNext();
-                header[i] = _input.GetByte();
+                header[i] = Input1.GetByte();
                 checksum += header[i];
             }
 
             // Read the checksum
             CheckedNext();
-            checksum += _input.GetByte();
+            checksum += Input1.GetByte();
             if (checksum != 0)
                 throw new InvalidDataException(string.Format("Check sum error on tap header (0x{0:x2})", checksum));
 
@@ -90,23 +92,36 @@ namespace tapetool2.Microbee
             }
         }
 
+        internal IByteStream Input1
+        {
+            get
+            {
+                return _input;
+            }
+
+            set
+            {
+                _input = value;
+            }
+        }
+
         public byte GetByte()
         {
-            return _input.GetByte();
+            return Input1.GetByte();
         }
 
         public override IEnumerable<IStream> EnumStreams()
         {
-            yield return _input;
+            yield return Input1;
         }
 
         public void CheckedNext()
         {
-            if (!_input.Next())
+            if (!Input1.Next())
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_blockAddress >= _header.datalen)
                 return false;
@@ -115,7 +130,7 @@ namespace tapetool2.Microbee
             CheckedNext();
 
             // Update check sum
-            _blockCheckSum += _input.GetByte();
+            _blockCheckSum += Input1.GetByte();
 
             if (_bytesLeftInBlock > 0)
             {
@@ -139,7 +154,7 @@ namespace tapetool2.Microbee
             {
                 _bytesLeftInBlock--;
                 CheckedNext();
-                _blockCheckSum += _input.GetByte();
+                _blockCheckSum += Input1.GetByte();
             }
             return true;
         }

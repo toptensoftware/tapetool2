@@ -182,7 +182,7 @@ namespace tapetool2.Audio
             return _samples[channel];
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_currentSample >= _totalSamples)
                 return false;
@@ -205,6 +205,15 @@ namespace tapetool2.Audio
         {
             Close();
             base.Dispose();
+        }
+
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    total Samples: {0}", _totalSamples);
+            w.WriteLine("    sample rate: {0}Hz", _sampleRate);
+            w.WriteLine("    channels: {0}", _channelCount);
+            w.WriteLine("    bits per sample: {0}", _bitsPerSample);
         }
     }
 }

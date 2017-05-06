@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2.Text
+namespace tapetool2.Binary
 {
     [FileWriter("textByteStreamWriter", "Text byte-stream file writer", ".bytes.txt")]
     class TextByteStreamWriter : StreamBase, IByteStream
@@ -80,7 +80,7 @@ namespace tapetool2.Text
             return _input.GetByte();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
             {

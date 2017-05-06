@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using tapetool2.Audio;
-using tapetool2.Tape;
+
 
 namespace tapetool2.Microbee
 {
@@ -95,7 +94,7 @@ namespace tapetool2.Microbee
             return CycleKind.TooLow;
         }
 
-        protected override bool OnNext()
+        public override bool Next()
         {
             _currentCycleSamples = FindZeroCrossing();
             return _currentCycleSamples >= 0;

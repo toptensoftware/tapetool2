@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
 
 namespace tapetool2.Microbee
 {
@@ -34,7 +35,7 @@ namespace tapetool2.Microbee
 
             // Open source stream
             _stream = File.OpenRead(Filename);
-            using (var br = new BinaryReader(_stream, Encoding.UTF8, true))
+            using (var br = new System.IO.BinaryReader(_stream, Encoding.UTF8, true))
             {
                 // Read and check the header
                 var str = new string(br.ReadChars(13), 0, 13);
@@ -53,7 +54,7 @@ namespace tapetool2.Microbee
             return _currentByte;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_stream.Position >= _stream.Length)
                 return false;

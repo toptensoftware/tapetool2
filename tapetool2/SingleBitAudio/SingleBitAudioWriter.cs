@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Audio;
 
 namespace tapetool2.SingleBitAudio
 {
@@ -99,7 +100,7 @@ namespace tapetool2.SingleBitAudio
             return _input.GetSample(channel);
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (!_input.Next())
                 return false;
@@ -147,6 +148,13 @@ namespace tapetool2.SingleBitAudio
         {
             Close();
             base.Dispose();
+        }
+
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    total Samples: {0}", _totalSamples);
+            w.WriteLine("    sample rate: {0}Hz", _input.SampleRate);
         }
     }
 }

@@ -7,22 +7,29 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Binary
 {
-    [FileReader("binReader", "Binary file reader", "bin")]
-    class BinaryReader : StreamBase, IByteStream
+    [FileWriter("binWriter", "Binary file writer", "bin")]
+    class BinaryWriter : StreamBase, IByteStream
     {
-        public BinaryReader()
+        public BinaryWriter()
         {
         }
 
-        [FilterOption("filename", "The file to read", IsFileName = true)]
+        [FilterOption("filename", "The file to write", IsFileName = true)]
         public string Filename
         {
             get;
             set;
         }
 
+        IByteStream _input;
+        [InputStream]
+        public IByteStream Input
+        {
+            get { return _input; }
+            set { _input = value; }
+        }
+
         FileStream _stream;
-        byte _currentByte;
 
         public override void Rewind()
         {
@@ -33,25 +40,24 @@ namespace tapetool2.Binary
             Close();
 
             // Open source stream
-            _stream = File.OpenRead(Filename);
+            _stream = File.Create(Filename);
         }
 
         public override IEnumerable<IStream> EnumStreams()
         {
-            yield break;
+            yield return Input;
         }
-
 
         public byte GetByte()
         {
-            return _currentByte;
+            return _input.GetByte();
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
-            if (_stream.Position >= _stream.Length)
+            if (!_input.Next())
                 return false;
-            _currentByte = (byte)_stream.ReadByte();
+            _stream.WriteByte(_input.GetByte());
             return true;
         }
 

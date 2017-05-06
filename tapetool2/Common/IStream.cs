@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,5 +27,8 @@ namespace tapetool2
 
         // Get all options for this stream/filter
         IEnumerable<FilterOptionAttribute> GetOptions();
+
+        // Write a summary of current state
+        void WriteSummary(TextWriter w);
     }
 }

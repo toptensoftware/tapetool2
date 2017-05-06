@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -190,7 +192,7 @@ namespace tapetool2.Microbee
             return true;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             // Get the next cycle kind
             CycleKind cycleKind;

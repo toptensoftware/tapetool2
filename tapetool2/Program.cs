@@ -96,10 +96,8 @@ namespace tapetool2
             foreach (var inp in stm.EnumStreams())
                 ShowChain(inp);
 
-            if (stm is CompositeStream)
-                Console.WriteLine("[{0}]", FilterInfo.NameOfFilter(stm));
-            else
-                Console.WriteLine("{0}", FilterInfo.NameOfFilter(stm));
+            stm.WriteSummary(Console.Out);
+            Console.WriteLine();
         }
 
         static bool SetArgument(IStream stopPos, IStream stm, string name, string value)
@@ -266,18 +264,23 @@ namespace tapetool2
                     return 0;
                 }
 
-                ShowChain(lastStream);
-
-                using (lastStream)
+                try
                 {
-                    // Dispose filters
-                    lastStream.Rewind();
-
-                    // Process filter until done
-                    while (lastStream.Next())
+                    using (lastStream)
                     {
-                        // nop
+                        // Dispose filters
+                        lastStream.Rewind();
+
+                        // Process filter until done
+                        while (lastStream.Next())
+                        {
+                            // nop
+                        }
                     }
+                }
+                finally
+                {
+                    ShowChain(lastStream);
                 }
 
                 return 0;
@@ -285,7 +288,7 @@ namespace tapetool2
             catch (Exception x)
             {
                 Console.WriteLine();
-                Console.WriteLine(x.Message);
+                Console.WriteLine("*** {0} ***", x.Message);
 
                 if (System.Diagnostics.Debugger.IsAttached)
                     throw;

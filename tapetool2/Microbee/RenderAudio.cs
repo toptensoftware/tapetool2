@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Audio;
 
 namespace tapetool2.Microbee
 {

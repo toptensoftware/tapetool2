@@ -45,7 +45,7 @@ namespace tapetool2.Audio
             return (float)(total / _input.ChannelCount);
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             return _input.Next();
         }

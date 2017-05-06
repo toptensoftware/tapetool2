@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using tapetool2.Audio;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -95,7 +96,7 @@ namespace tapetool2.Microbee
             return _currentSample ? _volume : -_volume;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             // Update the current sample number
             _currentSampleNumber++;

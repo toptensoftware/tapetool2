@@ -124,11 +124,16 @@ namespace tapetool2.Microbee
             yield return _input;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             return _input.Next();
         }
 
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    header: {0}", _header);
+        }
     }
 }
 

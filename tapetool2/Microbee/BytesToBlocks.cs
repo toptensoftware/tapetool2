@@ -5,7 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
+using tapetool2.Binary;
+using tapetool2.Tape;
 
 namespace tapetool2.Microbee
 {
@@ -116,13 +117,16 @@ namespace tapetool2.Microbee
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             // Clear old block
             _currentBlock = null;
 
             if (_blockAddress >= _header.datalen)
+            {
+                _input.Next();      // Trigger eof on input
                 return false;
+            }
 
             // How many bytes in this block
             var bytesInBlock = Math.Min((ushort)(_header.datalen - _blockAddress), (ushort)0x100);
@@ -154,6 +158,12 @@ namespace tapetool2.Microbee
             _blockAddress += 0x100;
 
             return true;
+        }
+
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            w.WriteLine("    header: {0}", _header);
         }
 
     }

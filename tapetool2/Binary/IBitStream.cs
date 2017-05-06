@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Binary
 {
-    [StreamKind("byte stream", "byte stream")]
-    interface IByteStream : IStream
+    [StreamKind("bit stream", "bit stream")]
+    interface IBitStream : IStream
     {
-        byte GetByte();
+        bool GetSample();
     }
 }

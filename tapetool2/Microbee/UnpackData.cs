@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using tapetool2.Binary;
 
 namespace tapetool2.Microbee
 {
@@ -60,7 +61,7 @@ namespace tapetool2.Microbee
                 throw new InvalidDataException("Unexpected EOF in tap stream");
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             switch (_state)
             {

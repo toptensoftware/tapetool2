@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Text
+namespace tapetool2.Tape
 {
     [FileReader("textCycleKindReader", "Text cycle-kind file reader", ".cycles.txt")]
     class TextCycleKindReader : StreamBase, ICycleKindStream
@@ -42,7 +42,6 @@ namespace tapetool2.Text
         }
 
         CycleKind _currentCycleKind;
-        int _currentBaudRate;
 
         public CycleKind GetCycleKind()
         {
@@ -51,10 +50,10 @@ namespace tapetool2.Text
 
         public int GetCurrentBaudRate()
         {
-            return _currentBaudRate;
+            return 0;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             char ch = _parser.Next();
 

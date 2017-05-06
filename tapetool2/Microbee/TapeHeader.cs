@@ -20,9 +20,20 @@ namespace tapetool2.Microbee
         public byte autostart;
         public byte unused;
 
+        public override string ToString()
+        {
+            return string.Format("name:'{0}',type:'{1}',datalen:0x{2:X4},load:0x{3:X4},start:0x{4:X4},speed:0x{5:X2},auto:0x{6:X2}",
+                filename, filetype, datalen, loadaddr, startaddr, speed, autostart);
+        }
+
         public string filename
         {
-            get { return Encoding.ASCII.GetString(_filename); }
+            get
+            {
+                if (_filename == null)
+                    return null;
+                return Encoding.ASCII.GetString(_filename);
+            }
             set
             {
                 _filename = Encoding.ASCII.GetBytes((value + "      ").Substring(0, 6));

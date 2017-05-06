@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Audio
 {
     static class WaveUtils
     {

@@ -108,7 +108,7 @@ namespace tapetool2.Audio
             return (float)_channelStreams[channel].CurrentSample;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             if (_tailSamples == 0)
                 return false;

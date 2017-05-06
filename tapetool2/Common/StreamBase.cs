@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,11 +51,16 @@ namespace tapetool2
         }
 
 
+        long _position;
+        bool _eof;
+
         public virtual void Rewind()
         {
             // Rewind input filter too
             foreach (var x in EnumStreams())
                 x.Rewind();
+            _position = -1;
+            _eof = false;
         }
 
         public virtual IStream UpstreamOfType(Type t)
@@ -80,7 +86,24 @@ namespace tapetool2
 
         public abstract IEnumerable<IStream> EnumStreams();
 
-        public abstract bool Next();
+        public virtual bool Next()
+        {
+            if (_eof)
+                return false;
+
+            if (OnNext())
+            {
+                _position++;
+                return true;
+            }
+            else
+            {
+                _eof = true;
+                return false;
+            }
+        }
+
+        protected abstract bool OnNext();
 
         public virtual void Dispose()
         {
@@ -127,6 +150,22 @@ namespace tapetool2
                 if (attr != null)
                     yield return attr;
             }
+        }
+
+        public virtual void WriteSummary(TextWriter w)
+        {
+            w.Write("{0}", FilterInfo.NameOfFilter(this as IStream));
+
+            // Show filename
+            var attr = GetType().GetCustomAttribute<FilterAttribute>();
+            if (attr!=null && attr.IsFileReader || attr.IsFileWriter)
+            {
+                var prop = GetType().GetProperty("Filename");
+                w.Write(": {0}", System.IO.Path.GetFileName((string)prop.GetValue(this)));
+            }
+
+            w.WriteLine();
+            w.WriteLine("    position: {0}{1}", _position, _eof ? " (EOF)" : "");
         }
 
     }

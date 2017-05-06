@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tapetool2
+namespace tapetool2.Tape
 {
     // When parsing/generating cassette tape audio
     // cycles are of two frequencies - High and Low

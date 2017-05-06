@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Text
+namespace tapetool2.Binary
 {
     [FileReader("textBitStreamReader", "Text bit-stream file reader", ".bits.txt")]
     class TextBitStreamReader : StreamBase, IBitStream
@@ -48,7 +48,7 @@ namespace tapetool2.Text
             return _currentBit;
         }
 
-        public override bool Next()
+        protected override bool OnNext()
         {
             char ch = _parser.Next();
 

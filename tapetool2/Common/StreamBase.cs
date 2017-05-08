@@ -13,6 +13,11 @@ namespace tapetool2
         {
         }
 
+        public long Position
+        {
+            get { return _position; }
+        }
+
         public virtual void SetInput(IStream input, string conversionNamespace)
         {
             // Find the intput property

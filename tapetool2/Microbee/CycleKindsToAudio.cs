@@ -27,7 +27,7 @@ namespace tapetool2.Microbee
             }
         }
 
-        int _sampleRate = 19200;
+        int _sampleRate = 22050;
         float _volume = 0.75f;
 
         [FilterOption("sampleRate", "sample rate at which to render")]

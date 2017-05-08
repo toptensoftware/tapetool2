@@ -13,9 +13,7 @@ namespace tapetool2.Microbee
     {
         public ParseAudio()
         {
-            Add(new AudioToCycleKinds());
-            Add(new CycleKindsToBits());
-            Add(new BitsToBytes());
+            Add(new AudioToBytes());
             Add(new BytesToBlocks());
         }
 
@@ -25,7 +23,7 @@ namespace tapetool2.Microbee
         {
             set
             {
-                ((AudioToCycleKinds)First).Input = value;
+                ((AudioToBytes)First).Input = value;
             }
         }
 

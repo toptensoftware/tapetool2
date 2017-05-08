@@ -21,7 +21,7 @@ namespace tapetool2.Audio
             set;
         }
 
-
+        
         void ReadHeader()
         {
             // Read the RIFF header
@@ -30,9 +30,9 @@ namespace tapetool2.Audio
             var riffType = _binaryReader.ReadUInt32();
             if (chunkId != WaveUtils.ChunkIdRiff || riffType != WaveUtils.RiffTypeWave)
                 throw new InvalidDataException(string.Format("{0} is not a valid wave file", Filename));
-
+                                                                                                                                                        
             // Read chunks
-            while (_stream.Position < _stream.Length)
+            while (_stream.Position + 4 < _stream.Length)
             {
                 chunkId = _binaryReader.ReadUInt32();
                 chunkLen = _binaryReader.ReadUInt32();

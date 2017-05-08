@@ -51,6 +51,7 @@
     <Compile Include="Audio\FirHighPass.cs" />
     <Compile Include="Audio\FirLowPass.cs" />
     <Compile Include="Binary\BinaryReader.cs" />
+    <Compile Include="Microbee\AudioToBytes.cs" />
     <Compile Include="Microbee\BitsToBytes.cs" />
     <Compile Include="Microbee\AudioToCycleKinds.cs" />
     <Compile Include="Microbee\UnpackData.cs" />
@@ -125,6 +126,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetDir)$(TargetFIleName) C:\Users\Brad\Dropbox\WinTools\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

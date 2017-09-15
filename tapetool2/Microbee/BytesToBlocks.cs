@@ -152,7 +152,7 @@ namespace tapetool2.Microbee
 
             // Check the checksum
             if ((byte)(checksum + block.Checksum) != 0)
-                throw new InvalidDataException("Checksum error on data block");
+                throw new InvalidDataException(string.Format("Checksum error on data block {0:X2}", (byte)(checksum + block.Checksum)));
 
             _currentBlock = block;
             _blockAddress += 0x100;

@@ -1,1 +1,0 @@
-..\tapetool2\bin\Debug\tapetool2.exe %*

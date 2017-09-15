@@ -102,7 +102,7 @@ namespace tapetool2.SingleBitAudio
 
         public float GetSample(int channel)
         {
-            return (_unreadBits & 0x01)!= 0 ? _highLevel : _lowLevel;
+            return (_unreadBits & 0x01) != 0 ? _highLevel : _lowLevel;
         }
 
         protected override bool OnNext()

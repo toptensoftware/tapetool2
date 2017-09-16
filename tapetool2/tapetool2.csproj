@@ -50,6 +50,7 @@
     <Compile Include="Audio\FirBandPass.cs" />
     <Compile Include="Audio\FirHighPass.cs" />
     <Compile Include="Audio\FirLowPass.cs" />
+    <Compile Include="Audio\Smooth.cs" />
     <Compile Include="Binary\BinaryReader.cs" />
     <Compile Include="Microbee\AudioToBytes.cs" />
     <Compile Include="Microbee\BitsToBytes.cs" />
@@ -88,6 +89,8 @@
     <Compile Include="Tape\TextCycleKindReader.cs" />
     <Compile Include="Tape\TextCycleKindWriter.cs" />
     <Compile Include="Tape\CycleLengthDetector.cs" />
+    <Compile Include="Utils\MovingAverage.cs" />
+    <Compile Include="Utils\RingBuffer.cs" />
     <Compile Include="Utils\TextParser.cs" />
     <Compile Include="Utils\BitStreamUtils.cs" />
     <Compile Include="Attributes\StreamKindAttribute.cs" />

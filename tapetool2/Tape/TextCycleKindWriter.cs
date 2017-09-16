@@ -34,7 +34,12 @@ namespace tapetool2.Tape
             set { _grouping = (uint)value; }
         }
 
-
+        [FilterOption("raw", "Raw data only")]
+        public bool Raw
+        {
+            get;
+            set;
+        }
 
         ICycleKindStream _input;
         [InputStream]
@@ -58,7 +63,8 @@ namespace tapetool2.Tape
             Close();
 
             _tw = new StreamWriter(Filename);
-            _tw.WriteLine("[cycle kinds]");
+            if (!Raw)
+                _tw.WriteLine("[cycle kinds]");
             _position = 0xFFFFFFFF;
             _prevBaudRate = 0;
 
@@ -83,21 +89,28 @@ namespace tapetool2.Tape
         {
             if (!_input.Next())
             {
-                _tw.WriteLine("\n\n[EOF]");
+                if (!Raw)
+                    _tw.WriteLine("\n\n[EOF]");
                 return false;
             }
 
             var br = _input.GetCurrentBaudRate();
             if (br != _prevBaudRate)
             {
-                _tw.Write("[baud:{0}]", br);
+                if (!Raw)
+                    _tw.Write("[baud:{0}]", br);
                 _prevBaudRate = br;
             }
 
             _position++;
 
             if ((_position % _perLine) == 0)
-                _tw.Write("\n[{0,10}] ", _position);
+            {
+                if (Raw)
+                    _tw.Write("\n");
+                else
+                    _tw.Write("\n[{0,10}] ", _position);
+            }
 
             if (_grouping != 0 && ((_position % _perLine) % _grouping) == 0)
             {

@@ -97,6 +97,13 @@ namespace tapetool2.Microbee
             }
         }
 
+        [FilterOption("trace", "trace mode")]
+        public bool Trace
+        {
+            get;
+            set;
+        }
+
 
         // Work out the sign of a sample, allowing for noise threshold around the center
         int SignOfSample(float sample)
@@ -209,6 +216,8 @@ namespace tapetool2.Microbee
             if (_eof)
                 return false;
 
+            var samplePos = ((StreamBase)_input).Position;
+
             // Skip the rest of the leading zero bit
             for (int i=0; i < _tapeSpeed * 2 - 1; i++)
             {
@@ -221,8 +230,14 @@ namespace tapetool2.Microbee
                 if (_eof)
                     return false;
 
+                var sp = ((StreamBase)_input).Position;
                 _currentByte = (byte)(ReadBit() | (_currentByte >> 1));
+                if (Trace)
+                    Console.WriteLine("Read bit {0:X2} from sample {1}", (_currentByte & 0x80)!=0 ? '1' : '0', sp);
             }
+
+            if (Trace)
+                Console.WriteLine("Read byte #{0} as {1:X2} from sample {2}", Position, _currentByte, samplePos);
 
             // Got the byte!
             return true;

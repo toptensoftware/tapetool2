@@ -22,6 +22,7 @@ namespace tapetool2.Binary
             set;
         }
 
+
         IBitStream _input;
         [InputStream]
         public IBitStream Input
@@ -48,6 +49,13 @@ namespace tapetool2.Binary
             set { _grouping = (uint)value; }
         }
 
+        [FilterOption("raw", "Raw data only")]
+        public bool Raw
+        {
+            get;
+            set;
+        }
+
         public override void Rewind()
         {
             // Base
@@ -56,7 +64,8 @@ namespace tapetool2.Binary
             Close();
 
             _tw = new StreamWriter(Filename);
-            _tw.WriteLine("[bits]");
+            if (!Raw)
+                _tw.WriteLine("[bits]");
             _position = 0xFFFFFFFF;
             _charBuf = new char[_perLine];
 
@@ -76,7 +85,8 @@ namespace tapetool2.Binary
         {
             if (!_input.Next())
             {
-                _tw.WriteLine("\n\n[EOF]");
+                if (!Raw)
+                    _tw.WriteLine("\n\n[EOF]");
                 return false;
             }
 
@@ -89,7 +99,10 @@ namespace tapetool2.Binary
 
             if ((_position % _perLine) == 0)
             {
-                _tw.Write("\n[{0:X8}] ", _position);
+                if (Raw)
+                    _tw.Write("\n");
+                else
+                    _tw.Write("\n[{0:X8}] ", _position);
             }
 
             var b = _input.GetSample();

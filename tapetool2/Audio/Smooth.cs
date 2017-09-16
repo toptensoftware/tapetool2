@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Audio
 {
-    [Filter("selectChannel", "Selects one channel from a multi-channel audio stream")]
-    class SelectChanel : StreamBase, IAudioStream
+    [Filter("smooth", "Smooths audio using a moving average")]
+    class Smooth : StreamBase, IAudioStream
     {
-        public SelectChanel()
+        public Smooth()
         {
-            _channel = 0;
         }
 
         IAudioStream _input;
-        int _channel;
+        MovingAverage _ma = new MovingAverage(8);
 
         [InputStream]
         public IAudioStream Input
@@ -24,13 +23,11 @@ namespace tapetool2.Audio
             set { _input = value; }
         }
 
-
-
-        [FilterOption("channel", "The channel to select from the source audio stream (default=0)")]
-        public int Channel
+        [FilterOption("period", "Smoothing period in samples (default=8)")]
+        public int Period
         {
-            get { return _channel; }
-            set { _channel = value; }
+            get { return _ma.Period; }
+            set { _ma.Period = value; }
         }
 
         public int ChannelCount
@@ -45,12 +42,15 @@ namespace tapetool2.Audio
 
         public float GetSample(int channel)
         {
-            return _input.GetSample(_channel);
+            return (float)_ma.Value;
         }
 
         protected override bool OnNext()
         {
-            return _input.Next();
+            if (!_input.Next())
+                return false;
+            _ma.Add(_input.GetSample(0));
+            return true;
         }
 
         public int BitsPerSample
@@ -62,5 +62,6 @@ namespace tapetool2.Audio
         {
             yield return _input;
         }
+
     }
 }

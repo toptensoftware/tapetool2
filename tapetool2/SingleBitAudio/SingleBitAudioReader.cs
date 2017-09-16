@@ -39,6 +39,12 @@ namespace tapetool2.SingleBitAudio
             set { _lowLevel = value; }
         }
 
+        [FilterOption("trace", "trace mode")]
+        public bool Trace
+        {
+            get;
+            set;
+        }
 
         public override void Rewind()
         {
@@ -118,6 +124,8 @@ namespace tapetool2.SingleBitAudio
 
             if (_unreadBitCount == 0)
             {
+                if (Trace)
+                    Console.WriteLine("Load sba byte at offset {0}", _stream.Position);
                 _unreadBits = (byte)_stream.ReadByte();
                 _unreadBitCount = 8;
             }

@@ -43,6 +43,14 @@ namespace tapetool2.Binary
             set { _hexPrefix = value; }
         }
 
+        [FilterOption("raw", "Raw data only")]
+        public bool Raw
+        {
+            get;
+            set;
+        }
+
+
         IByteStream _input;
         [InputStream]
         public IByteStream Input
@@ -64,7 +72,8 @@ namespace tapetool2.Binary
             Close();
 
             _tw = new StreamWriter(Filename);
-            _tw.WriteLine("[bytes]");
+            if (!Raw)
+                _tw.WriteLine("[bytes]");
             _position = 0xFFFFFFFF;
             _charBuf = new char[_perLine];
 
@@ -84,12 +93,13 @@ namespace tapetool2.Binary
         {
             if (!_input.Next())
             {
-                if (_position > 0 && _ascii)
+                if (_position > 0 && _ascii && !Raw)
                 {
                     _tw.Write(new string(' ', (int)(_perLine - _position % _perLine - 1) * 3));
                     _tw.Write("  ; {0}", new string(_charBuf, 0, (int)(_position % _perLine) + 1));
                 }
-                _tw.WriteLine("\n\n[EOF]");
+                if (!Raw)
+                    _tw.WriteLine("\n\n[EOF]");
                 return false;
             }
 
@@ -97,11 +107,14 @@ namespace tapetool2.Binary
 
             if ((_position % _perLine) == 0)
             {
-                if (_position > 0 && ascii)
+                if (_position > 0 && ascii && !Raw)
                 {
                     _tw.Write("  ; {0}", new string(_charBuf, 0, _charBuf.Length));
                 }
-                _tw.Write("\n[{0:X8}] ", _position);
+                if (Raw)
+                    _tw.Write("\n");
+                else
+                    _tw.Write("\n[{0:X8}] ", _position);
             }
 
             var b = _input.GetByte();

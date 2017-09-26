@@ -139,7 +139,11 @@ namespace tapetool2
                 value = System.IO.Path.GetFullPath(value);
 
             // Convert string to correct type
-            var typedValue = Convert.ChangeType(value, prop.PropertyType);
+            object typedValue;
+            if (value == null && prop.PropertyType == typeof(bool))
+                typedValue = true;
+            else
+                typedValue = Convert.ChangeType(value, prop.PropertyType);
 
             // Set it
             prop.SetValue(this, typedValue);

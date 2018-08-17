@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using tapetool2.Binary;
 using tapetool2.Tape;
 
-namespace tapetool2.Microbee
+namespace tapetool2.Kansas
 {
-    [Filter("microbee.bitsToBytes", "Decodes a Microbee bit stream into byte stream")]
+    [Filter("kansas.bitsToBytes", "Decodes a Kansas City bit stream into byte stream")]
     class BitsToBytes : StreamBase, IByteStream, ISetUpstreamBaudRate
     {
         public BitsToBytes()

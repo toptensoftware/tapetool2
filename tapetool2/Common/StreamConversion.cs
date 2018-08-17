@@ -11,15 +11,15 @@ namespace tapetool2
     {
         static List<MethodInfo> _conversionMethods;
 
-        public static T ConvertStream<T>(IStream stream, Type targetObjectType, string nameSpace) where T : IStream
+        public static T ConvertStream<T>(IStream stream, Type targetObjectType, List<string> nameSpaces) where T : IStream
         {
-            return (T)ConvertStream(stream, typeof(T), targetObjectType, nameSpace);
+            return (T)ConvertStream(stream, typeof(T), targetObjectType, nameSpaces);
         }
 
-        public static IStream ConvertStream(IStream stream, Type to, Type targetObjectType, string nameSpace)
+        public static IStream ConvertStream(IStream stream, Type to, Type targetObjectType, List<string> nameSpaces)
         {
             // Find best method
-            var mi = FindConversionMethod(stream.GetType(), to, targetObjectType, nameSpace);
+            var mi = FindConversionMethod(stream.GetType(), to, targetObjectType, nameSpaces);
             if (mi == null)
                 return null;
 
@@ -29,7 +29,7 @@ namespace tapetool2
 
         public static IEnumerable<string> FindPossibleConversionNamespaces(Type from, Type to, Type targetObjectType)
         {
-            return FindConversionMethods(from, to, targetObjectType, "*").Select(x =>
+            return FindConversionMethods(from, to, targetObjectType, null).Select(x =>
             {
                 var attr = x.GetCustomAttribute<StreamConverterAttribute>();
                 if (attr != null && attr.Namespace != null)
@@ -38,7 +38,7 @@ namespace tapetool2
             }).Where(x=>x!=null).Distinct();
         }
 
-        public static IEnumerable<MethodInfo> FindConversionMethods(Type from, Type to, Type targetObjectType, string nameSpace)
+        public static IEnumerable<MethodInfo> FindConversionMethods(Type from, Type to, Type targetObjectType, List<string> nameSpaces)
         {
             if (_conversionMethods == null)
             {
@@ -58,9 +58,18 @@ namespace tapetool2
                     return false;
 
                 // Namespace must match
-                if (nameSpace != "*")
+                if (nameSpaces != null && attr.Namespace != null)
                 {
-                    if (attr.Namespace != null && string.Compare(attr.Namespace, nameSpace, true) != 0)
+                    bool found = false;
+                    foreach (var ns in nameSpaces)
+                    {
+                        if (string.Compare(attr.Namespace, ns, true) == 0)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
                         return false;
                 }
 
@@ -68,9 +77,9 @@ namespace tapetool2
             });
         }
 
-        public static MethodInfo FindConversionMethod(Type from, Type to, Type targetObjectType, string nameSpace)
+        public static MethodInfo FindConversionMethod(Type from, Type to, Type targetObjectType, List<string> nameSpaces)
         {
-            var methods = FindConversionMethods(from, to, targetObjectType, nameSpace);
+            var methods = FindConversionMethods(from, to, targetObjectType, nameSpaces);
 
             // Look for exact match
             foreach (var m in methods)

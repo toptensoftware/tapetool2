@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using tapetool2.Audio;
 using tapetool2.Tape;
 
-namespace tapetool2.Microbee
+namespace tapetool2.Kansas
 {
-    [Filter("microbee.audioToCycleKinds", "Generates Microbee audio cycles from a cycle kind stream")]
+    [Filter("kansas.audioToCycleKinds", "Generates Kansas City audio cycles from a cycle kind stream")]
     class AudioToCycleKinds : StreamBase, ICycleKindStream
     {
         public AudioToCycleKinds()

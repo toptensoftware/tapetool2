@@ -15,8 +15,8 @@ namespace tapetool2
         static void ShowLogo()
         {
             // Show some help
-            Console.WriteLine("tapetool2 v{0}.{1} - Microbee/TRS-80 Tape Diagnotic Utility", verMajor, verMinor);
-            Console.WriteLine("Copyright (C) 2017 Topten Software.\n");
+            Console.WriteLine("tapetool2 v{0}.{1} - Microbee/Sorcerer Tape Diagnotic Utility", verMajor, verMinor);
+            Console.WriteLine("Copyright (C) 2017-2018 Topten Software.\n");
         }
 
         static void ShowUsage()
@@ -40,7 +40,12 @@ namespace tapetool2
 
             foreach (var ns in FilterInfo.Namespaces)
             {
-                Console.WriteLine("  {0,-30} {1}", string.Format("--{0}", ns), string.Format("Use filters '{0}.*'", ns));
+                var inheritedNamespaces = FilterInfo.GetInheritedNamespaces(ns).ToList();
+                inheritedNamespaces.Insert(0, ns);
+                Console.WriteLine("  {0,-30} {1} {2}", 
+                    string.Format("--{0}", ns), 
+                    string.Format("Use filters"), 
+                    string.Join(", ", inheritedNamespaces.Select(x=>string.Format("'{0}.*'", x))));
             }
 
             Console.WriteLine("\n");
@@ -121,7 +126,7 @@ namespace tapetool2
         static IStream lastStream;
         static IStream firstStream;
         static bool showFilterHelp;
-        static string _currentNamespace;
+        static List<string> _usingNamespaces = new List<string>();
 
         static void ProcessArg(string arg)
         {
@@ -198,7 +203,8 @@ namespace tapetool2
 
                 if (FilterInfo.Namespaces.Contains(SwitchName, StringComparer.InvariantCultureIgnoreCase))
                 {
-                    _currentNamespace = SwitchName;
+                    _usingNamespaces.Add(SwitchName);
+                    _usingNamespaces.AddRange(FilterInfo.GetInheritedNamespaces(SwitchName));
                 }
             }
             else
@@ -206,16 +212,22 @@ namespace tapetool2
                 IStream nextStream = null;
 
                 // Try creating a file stream first
-                nextStream = FilterInfo.CreateFileStream(arg, lastStream);
+                nextStream = FilterInfo.CreateFileStream(arg, lastStream, _usingNamespaces);
 
                 // If failed look for a filter
                 if (nextStream == null)
                 {
                     // Find filter info
                     var fi = FilterInfo.FindByName(arg);
-                    if (fi == null && _currentNamespace != null)
+                    if (fi == null)
                     {
-                        fi = FilterInfo.FindByName(string.Format("{0}.{1}", _currentNamespace, arg));
+                        // Scan using namespaces
+                        foreach (var ns in _usingNamespaces)
+                        {
+                            fi = FilterInfo.FindByName(string.Format("{0}.{1}", ns, arg));
+                            if (fi != null)
+                                break;
+                        }
                     }
 
                     if (fi == null)
@@ -226,7 +238,7 @@ namespace tapetool2
                 }
 
                 // Connect
-                nextStream.SetInput(lastStream, _currentNamespace);
+                nextStream.SetInput(lastStream, _usingNamespaces);
 
                 // Remember the last user generated stream
                 nextToLastStream = lastStream;
@@ -242,6 +254,10 @@ namespace tapetool2
         {
             try
             {
+                // Microbee namespace also includes all of Kansas
+                //FilterInfo.RegisterInheritedNamespace("microbee", "kansas");
+                //FilterInfo.RegisterInheritedNamespace("sorcerer", "kansas");
+
                 lastStream = null;
                 for (int i=0; i < args.Length; i++)
                 {

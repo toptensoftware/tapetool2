@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using tapetool2.Binary;
 using tapetool2.Tape;
 
-namespace tapetool2.Microbee
+namespace tapetool2.Kansas
 {
 
-    [Filter("microbee.cycleKindsToBits", "Parses Microbee cycle kinds into a bit stream")]
+    [Filter("kansas.cycleKindsToBits", "Parses Kansas City cycle kinds into a bit stream")]
     class CycleKindsToBits : StreamBase, IBitStream, ISetUpstreamBaudRate
     {
         public CycleKindsToBits()

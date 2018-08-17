@@ -11,7 +11,7 @@ namespace tapetool2
         {
         }
 
-        public virtual void SetInput(IStream input, string conversionNamespace)
+        public virtual void SetInput(IStream input, List<string> conversionNamespace)
         {
             First.SetInput(input, conversionNamespace);
         }

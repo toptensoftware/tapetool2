@@ -18,7 +18,7 @@ namespace tapetool2
             get { return _position; }
         }
 
-        public virtual void SetInput(IStream input, string conversionNamespace)
+        public virtual void SetInput(IStream input, List<string> conversionNamespace)
         {
             // Find the intput property
             var prop = GetType().GetProperties().FirstOrDefault(x => x.GetCustomAttributes(true).OfType<InputStreamAttribute>().Any());

@@ -22,7 +22,19 @@ namespace tapetool2
             get { return _attr.Name; }
         }
 
-        public FilterAttribute Attributes
+        public string Namespace
+        {
+            get
+            {
+                int dotPos = Name.IndexOf('.');
+                if (dotPos >= 0)
+                    return Name.Substring(0, dotPos);
+                else
+                    return null;
+            }
+        }
+
+public FilterAttribute Attributes
         {
             get { return _attr; }
         }
@@ -69,11 +81,14 @@ namespace tapetool2
 
                 foreach (var i in SupportedFilters)
                 {
-                    int dotPos = i.Name.IndexOf('.');
-                    if (dotPos >= 0)
-                    {
-                        namespaces.Add(i.Name.Substring(0, dotPos));
-                    }
+                    var ns = i.Namespace;
+                    if (ns != null)
+                        namespaces.Add(ns);
+                }
+
+                foreach (var k in _inheritedNamespaces.Keys)
+                {
+                    namespaces.Add(k);
                 }
 
                 return namespaces.OrderBy(x => x);
@@ -98,18 +113,19 @@ namespace tapetool2
                 return attr.Name;
         }
 
-        public static FilterInfo ResolveFileTypeFilter(string filename, IStream sourceStream)
+        public static FilterInfo ResolveFileTypeFilter(string filename, IStream sourceStream, List<string> namespaces)
         {
             // Look for an appropriate filter
             var contenders = _all.Values.Where(x =>
                 x.Attributes.FileExtension != null &&
+                (x.Namespace == null || (namespaces != null && namespaces.Contains(x.Namespace, StringComparer.InvariantCultureIgnoreCase))) && 
                 filename.EndsWith(x.Attributes.FileExtension, StringComparison.InvariantCultureIgnoreCase) &&
                 x.Attributes.IsFileReader == (sourceStream == null)
                 ).ToList();
 
             if (contenders.Count == 0)
             {
-                if (FilterInfo.Namespaces.Any(x=>filename.StartsWith(x + ".", StringComparison.InvariantCultureIgnoreCase)))
+                if (FilterInfo.Namespaces.Any(x => filename.StartsWith(x + ".", StringComparison.InvariantCultureIgnoreCase)))
                 {
                     // It might be a filter qualifier and not really a filename
                     // eg: microbee.renderAudio
@@ -126,12 +142,12 @@ namespace tapetool2
             return null;
         }
 
-        public static IStream CreateFileStream(string filename, IStream sourceStream)
+        public static IStream CreateFileStream(string filename, IStream sourceStream, List<string> namespaces)
         {
             if (filename.IndexOf('.') < 0)
                 return null;
 
-            var fti = ResolveFileTypeFilter(filename, sourceStream);
+            var fti = ResolveFileTypeFilter(filename, sourceStream, namespaces);
             if (fti == null)
                 return null;
 
@@ -152,6 +168,28 @@ namespace tapetool2
         public static IStream CreateFileWriter(string filename)
         {
             return null;
+        }
+
+        static Dictionary<string, List<string>> _inheritedNamespaces = new Dictionary<string, List<string>>();
+
+        public static void RegisterInheritedNamespace(string nameSpace, string inheritsFrom)
+        {
+            List<string> inherits;
+            if (!_inheritedNamespaces.TryGetValue(nameSpace, out inherits))
+            {
+                inherits = new List<string>();
+                _inheritedNamespaces.Add(nameSpace, inherits);
+            }
+            inherits.Add(inheritsFrom);
+        }
+
+        public static IEnumerable<string> GetInheritedNamespaces(string nameSpace)
+        {
+            List<string> inherits;
+            if (!_inheritedNamespaces.TryGetValue(nameSpace, out inherits))
+                return Enumerable.Empty<string>();
+
+            return inherits;
         }
     }
 }

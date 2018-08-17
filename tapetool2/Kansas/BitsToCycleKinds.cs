@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using tapetool2.Binary;
 using tapetool2.Tape;
 
-namespace tapetool2.Microbee
+namespace tapetool2.Kansas
 {
-    [Filter("microbee.bitsToCycleKinds", "Generates Microbee cycle kinds from a bit stream")]
+    [Filter("kansas.bitsToCycleKinds", "Generates Kansas City cycle kinds from a bit stream")]
     class BitsToCycleKinds : StreamBase, ICycleKindStream
     {
         public BitsToCycleKinds()

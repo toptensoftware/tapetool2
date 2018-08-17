@@ -18,6 +18,12 @@ namespace tapetool2.Kansas
         IByteStream _input;
         IBaudRateProvider _sourceBRP;
 
+        FormatSpec _formatSpec = FormatSpec.KansasCity;
+        public void SetFormatSpec(FormatSpec spec)
+        {
+            _formatSpec = spec;
+        }
+
         [InputStream]
         public IByteStream Input
         {
@@ -42,10 +48,9 @@ namespace tapetool2.Kansas
         enum State
         {
             bof,
-            leadBit,
+            leadBits,
             dataBits,
-            tailBit1,
-            tailBit2,
+            tailBits,
             eof,
         }
         State _state;
@@ -62,22 +67,38 @@ namespace tapetool2.Kansas
             yield return _input;
         }
 
+        BaudSpec _baudSpec;
+
         public bool GetSample()
         {
             switch (_state)
             {
-                case State.leadBit:
-                    return false;
+                case State.leadBits:
+                    return _baudSpec.leadBits[_bitCounter];
 
                 case State.dataBits:
-                    return ((_input.GetByte() >> _bitCounter) & 0x01)!= 0;
+                    return ((_input.GetByte() >> _bitCounter) & 0x01) != 0;
 
-                case State.tailBit1:
-                case State.tailBit2:
-                    return true;
+                case State.tailBits:
+                    return _baudSpec.tailBits[_bitCounter];
             }
 
             throw new InvalidOperationException();
+        }
+
+        bool StartByte()
+        {
+            _bitCounter = 0;
+
+            if (!_input.Next())
+                return false;
+
+            if (_sourceBRP != null)
+                _currentBaudRate = _sourceBRP.BaudRate;
+
+            _baudSpec = _formatSpec.GetBaudSpec(_currentBaudRate);
+            _state = _baudSpec.leadBits.Length == 0 ? State.dataBits : State.leadBits;
+            return true;
         }
 
         protected override bool OnNext()
@@ -85,34 +106,39 @@ namespace tapetool2.Kansas
             switch (_state)
             {
                 case State.bof:
-                    if (!_input.Next())
-                        return false;
-                    _state = State.leadBit;
-                    if (_sourceBRP!=null)
-                        _currentBaudRate = _sourceBRP.BaudRate;
-                    break;
+                    return StartByte();
 
-                case State.leadBit:
-                    _bitCounter = 0;
-                    _state = State.dataBits;
+                case State.leadBits:
+                    _bitCounter++;
+                    if (_bitCounter == _baudSpec.leadBits.Length)
+                    {
+                        _bitCounter = 0;
+                        _state = State.dataBits;
+                    }
                     break;
 
                 case State.dataBits:
                     _bitCounter++;
                     if (_bitCounter == 8)
-                        _state = State.tailBit1;
+                    {
+                        if (_baudSpec.tailBits.Length > 0)
+                        {
+                            _bitCounter = 0;
+                            _state = State.tailBits;
+                        }
+                        else
+                        {
+                            return StartByte();
+                        }
+                    }
                     break;
 
-                case State.tailBit1:
-                    _state = State.tailBit2;
-                    break;
-
-                case State.tailBit2:
-                    if (!_input.Next())
-                        return false;
-                    if (_sourceBRP != null)
-                        _currentBaudRate = _sourceBRP.BaudRate;
-                    _state = State.leadBit;
+                case State.tailBits:
+                    _bitCounter++;
+                    if (_bitCounter == _baudSpec.tailBits.Length)
+                    {
+                        return StartByte();
+                    }
                     break;
             }
 

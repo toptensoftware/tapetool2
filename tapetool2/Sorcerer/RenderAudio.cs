@@ -15,8 +15,8 @@ namespace tapetool2.Sorcerer
             Add(new SetHeader());
             Add(new BlocksToBytes());
             Add(new BytesToBits());
-            Add(new BitsToCycleKinds());
-            Add(_last = new CycleKindsToAudio());
+            Add(new BitsToHalfCycleKinds());
+            Add(_last = new HalfCycleKindsToAudio());
         }
 
         IAudioStream _last;

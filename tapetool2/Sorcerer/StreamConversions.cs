@@ -42,9 +42,9 @@ namespace tapetool2.Sorcerer
         }
 
         [StreamConverter(Namespace = "Exidy Sorcerer")]
-        public static ICycleKindStream ConvertAudioToCycleKinds(IAudioStream audio)
+        public static IHalfCycleKindStream ConvertAudioToHalfCycleKinds(IAudioStream audio)
         {
-            return new AudioToCycleKinds() { Input = audio };
+            return new AudioToHalfCycleKinds() { Input = audio };
         }
 
         [StreamConverter(Namespace = "Exidy Sorcerer")]
@@ -78,9 +78,9 @@ namespace tapetool2.Sorcerer
         }
 
         [StreamConverter(Namespace="Exidy Sorcerer")]
-        public static IAudioStream ConvertCycleKindsToAudio(ICycleKindStream cycles)
+        public static IAudioStream ConvertHalfCycleKindsToAudio(IHalfCycleKindStream cycles)
         {
-            return new CycleKindsToAudio() { Input = cycles };
+            return new HalfCycleKindsToAudio() { Input = cycles };
         }
     }
 }

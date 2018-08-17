@@ -9,20 +9,37 @@ using tapetool2.Tape;
 
 namespace tapetool2.Kansas
 {
-    [Filter("kansas.audioToCycleKinds", "Generates Kansas City audio cycles from an audio stream")]
-    class AudioToCycleKinds : StreamBase, ICycleKindStream
+    [Filter("kansas.audioToHalfCycleKinds", "Generates Kansas City audio half-cycles from an audio stream")]
+    class AudioToHalfCycleKinds : StreamBase, IHalfCycleKindStream
     {
-        public AudioToCycleKinds()
+        public AudioToHalfCycleKinds()
         {
         }
 
+        FormatSpec _formatSpec = FormatSpec.KansasCity;
+        public void SetFormatSpec(FormatSpec spec)
+        {
+            _formatSpec = spec;
+        }
+
         IAudioStream _input;
-        int _samplesPerHighCycle;
-        int _samplesPerLowCycle;
+        int _samplesPerHighHalfCycle;
+        int _samplesPerLowHalfCycle;
         int _sampleMargin;
         int _currentCycleSamples;
-        CycleLengthDetector _cld = new CycleLengthDetector() { Method = CycleLengthMethod.ZeroCrossingDown };
-    
+        HalfCycleLengthDetector _cld = new HalfCycleLengthDetector();
+
+        BaudSpec _baudSpec;
+        int _baudRate = 300;
+        [FilterOption("baudRate", "baud rate (default=300)")]
+        public int baudRate
+        {
+            set
+            {
+                _baudRate = value;
+            }
+        }
+
         [InputStream]
         public IAudioStream Input
         {
@@ -32,19 +49,12 @@ namespace tapetool2.Kansas
                 _input = value;
             }
         }
-        
-        [FilterOption("cycleMethod", "sets the method used to measure cycle lengths (zc+, zc-, duty+ or duty-). Default = zc-")]
-        public string cycleMethod
-        {
-            set
-            {
-                _cld.Method = CycleLengthDetector.ParseMethod(value);
-            }
-        }
 
         public override void Rewind()
         {
             base.Rewind();
+
+            _baudSpec = _formatSpec.GetBaudSpec(_baudRate);
 
             // Find the first positive sample 
             while (_input.Next() && _input.GetSample(0) <= 0)
@@ -53,9 +63,9 @@ namespace tapetool2.Kansas
 
             _cld.Reset();
 
-            _samplesPerHighCycle = _input.SampleRate / 2400;
-            _samplesPerLowCycle = _input.SampleRate / 1200;
-            _sampleMargin = (_samplesPerLowCycle - _samplesPerHighCycle) / 2 - 1;
+            _samplesPerHighHalfCycle = (_input.SampleRate /  (_baudSpec.LowFrequency * 2)) / 2;
+            _samplesPerLowHalfCycle = (_input.SampleRate / _baudSpec.LowFrequency) / 2;
+            _sampleMargin = (_samplesPerLowHalfCycle - _samplesPerHighHalfCycle) / 2 - 1;
             _eof = false;
             _invalidCount = 0;
             _indeterminateCount = 0;
@@ -87,26 +97,23 @@ namespace tapetool2.Kansas
             yield return _input;
         }
 
-        const double highCycleTime = 1.0 / 2400;
-        const double lowCycleTime = 1.0 / 1200;
-
         public int GetCurrentBaudRate()
         {
             // We don't know!
             return 0;
         }
 
-        public CycleKind GetCycleKind()
+        public HalfCycleKind GetHalfCycleKind()
         {
-            if (_currentCycleSamples < _samplesPerHighCycle - _sampleMargin)
-                return CycleKind.TooHigh;
-            if (_currentCycleSamples <= _samplesPerHighCycle + _sampleMargin)
-                return CycleKind.High;
-            if (_currentCycleSamples < _samplesPerLowCycle - _sampleMargin)
-                return CycleKind.Indeterminate;
-            if (_currentCycleSamples <= _samplesPerLowCycle + _sampleMargin)
-                return CycleKind.Low;
-            return CycleKind.TooLow;
+            if (_currentCycleSamples < _samplesPerHighHalfCycle - _sampleMargin)
+                return HalfCycleKind.TooHigh;
+            if (_currentCycleSamples <= _samplesPerHighHalfCycle + _sampleMargin)
+                return HalfCycleKind.High;
+            if (_currentCycleSamples < _samplesPerLowHalfCycle - _sampleMargin)
+                return HalfCycleKind.Indeterminate;
+            if (_currentCycleSamples <= _samplesPerLowHalfCycle + _sampleMargin)
+                return HalfCycleKind.Low;
+            return HalfCycleKind.TooLow;
         }
 
         protected override bool OnNext()
@@ -117,14 +124,14 @@ namespace tapetool2.Kansas
                 return false;
             }
                     
-            switch (GetCycleKind())
+            switch (GetHalfCycleKind())
             {
-                case CycleKind.Indeterminate:
+                case HalfCycleKind.Indeterminate:
                     _indeterminateCount++;
                     break;
 
-                case CycleKind.TooHigh:
-                case CycleKind.TooLow:
+                case HalfCycleKind.TooHigh:
+                case HalfCycleKind.TooLow:
                     _invalidCount++;
                     break;
             }
@@ -135,13 +142,10 @@ namespace tapetool2.Kansas
         public override void WriteSummary(TextWriter w)
         {
             base.WriteSummary(w);
-            w.WriteLine("    cycle method: {0}", _cld.Method.ToString());
             w.WriteLine("    indeterminate cycles: {0}", _indeterminateCount);
             w.WriteLine("    invalid cycles: {0}", _invalidCount);
-            w.WriteLine("    short cycle: {0} - {1}", _samplesPerHighCycle - _sampleMargin, _samplesPerHighCycle + _sampleMargin);
-            w.WriteLine("    long cycle:  {0} - {1}", _samplesPerLowCycle - _sampleMargin, _samplesPerLowCycle + _sampleMargin);
-
+            w.WriteLine("    short cycle: {0} - {1}", _samplesPerHighHalfCycle - _sampleMargin, _samplesPerHighHalfCycle + _sampleMargin);
+            w.WriteLine("    long cycle:  {0} - {1}", _samplesPerLowHalfCycle - _sampleMargin, _samplesPerLowHalfCycle + _sampleMargin);
         }
-
     }
 }

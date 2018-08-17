@@ -11,8 +11,14 @@ namespace tapetool2.Microbee
     {
     }
 
-    [Filter("microbee.audioToCycleKinds", "Generates Microbee audio cycles from a cycle kind stream")]
+    [Filter("microbee.audioToCycleKinds", "Generates Microbee audio cycles from an audio stream")]
     class AudioToCycleKinds : Kansas.AudioToCycleKinds
+    {
+    }
+
+
+    [Filter("microbee.audioToHalfCycleKinds", "Generates Microbee audio half-cycles from an audio stream")]
+    class AudioToHalfCycleKinds : Kansas.AudioToHalfCycleKinds
     {
     }
 
@@ -33,6 +39,11 @@ namespace tapetool2.Microbee
 
     [Filter("microbee.cycleKindsToAudio", "Generates Microbee audio cycles from a cycle kind stream")]
     class CycleKindsToAudio : Kansas.CycleKindsToAudio
+    {
+    }
+
+    [Filter("microbee.halfCycleKindsToAudio", "Generates Microbee audio from a half-`cycle kind stream")]
+    class HalfCycleKindsToAudio : Kansas.HalfCycleKindsToAudio
     {
     }
 

@@ -123,7 +123,7 @@ namespace tapetool2.Audio
             _currentSample = 0;
 
             // Open stream
-            _stream = File.OpenRead(Filename);
+            _stream = File.Open(Filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             _binaryReader = new BinaryReader(_stream, Encoding.UTF8, true);
 
             // Read header

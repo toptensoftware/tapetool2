@@ -17,7 +17,7 @@ namespace tapetool2.Kansas
         {
         }
 
-        IAudioStream _input;
+        protected IAudioStream _input;
     
         [InputStream]
         public IAudioStream Input
@@ -29,9 +29,9 @@ namespace tapetool2.Kansas
             }
         }
 
-        const int TAPE_SPEED_300 = 4;
-        const int TAPE_SPEED_600 = 2;
-        const int TAPE_SPEED_1200 = 1;
+        protected const int TAPE_SPEED_300 = 4;
+        protected const int TAPE_SPEED_600 = 2;
+        protected const int TAPE_SPEED_1200 = 1;
 
         public override void Rewind()
         {
@@ -117,8 +117,8 @@ namespace tapetool2.Kansas
 
         // Measure the length of the next half cycle
         // (ie: number of samples before sign of current sample changes)
-        bool _eof;
-        int ReadHalfCycleLength()
+        protected bool _eof;
+        protected int ReadHalfCycleLength()
         {
             if (_eof)
                 return -1;
@@ -143,7 +143,7 @@ namespace tapetool2.Kansas
             return halfCycleLength;
         }
 
-        public byte ReadBit()
+        public virtual byte ReadBit()
         {
             ReadHalfCycleLength();
 
@@ -177,9 +177,9 @@ namespace tapetool2.Kansas
             yield return _input;
         }
 
-        int _tapeSpeed;         // 1 = 1200, 2 = 600, 4 = 300
-        int _cutOffSamples;
-        byte _currentByte;
+        protected int _tapeSpeed;         // 1 = 1200, 2 = 600, 4 = 300
+        protected int _cutOffSamples;
+        protected byte _currentByte;
 
         public int GetCurrentBaudRate()
         {

@@ -8,10 +8,10 @@ using tapetool2.Tape;
 
 namespace tapetool2.Kansas
 {
-    [Filter("kansas.bitsToCycleKinds", "Generates Kansas City cycle kinds from a bit stream")]
-    class BitsToCycleKinds : StreamBase, ICycleKindStream
+    [Filter("kansas.bitsToHalfCycleKinds", "Generates Kansas City half-cycle kinds from a bit stream")]
+    class BitsToHalfCycleKinds : StreamBase, IHalfCycleKindStream
     {
-        public BitsToCycleKinds()
+        public BitsToHalfCycleKinds()
         {
         }
 
@@ -43,10 +43,10 @@ namespace tapetool2.Kansas
 
         State _state;
         int _cyclesLeft;
-        CycleKind _cycleKind;
+        HalfCycleKind _halfCycleKind;
         int _baudRate;
 
-        [FilterOption("baudRate", "Baud rate to render at 0=auto, 300, 600 or 1200")]
+        [FilterOption("baudRate", "Baud rate to render at")]
         public int BaudRate
         {
             set
@@ -71,9 +71,9 @@ namespace tapetool2.Kansas
             return ResolveBaudRate();
         }
 
-        public CycleKind GetCycleKind()
+        public HalfCycleKind GetHalfCycleKind()
         {
-            return _cycleKind;
+            return _halfCycleKind;
         }
 
         int ResolveBaudRate()
@@ -84,9 +84,7 @@ namespace tapetool2.Kansas
             if (_sourceBRP == null)
                 return 300;
 
-            int rate = _sourceBRP.BaudRate;
-
-            return rate;
+            return _sourceBRP.BaudRate;
         }
 
         BaudSpec _activeBaudSpec;
@@ -113,22 +111,11 @@ namespace tapetool2.Kansas
                     bool bit = _input.GetSample();
 
                     // Get the spec for this bit
-                    var baudSpec = ResolveBaudSpec();
+                    var spec = ResolveBaudSpec();
 
-                    // How many half-cycles for this bit
-                    _cyclesLeft = bit ? baudSpec.OneBitHalfCycleCount : baudSpec.ZeroBitHalfCycleCount;
-                    // Convert to full cycles
-                    if ((_cyclesLeft % 2) != 0)
-                        throw new InvalidOperationException("Half-cycles not supported");
-                    _cyclesLeft /= 2;
-
-                    // What kind of cycles?
-                    if ((bit ? baudSpec.OneBitHalfCycleKind : baudSpec.ZeroBitHalfCycleKind) == HalfCycleKind.Low)
-                        _cycleKind = CycleKind.Low;
-                    else
-                        _cycleKind = CycleKind.High;
-
-                    // Switch state
+                    // Setup for cycles
+                    _cyclesLeft = bit ? spec.OneBitHalfCycleCount : spec.ZeroBitHalfCycleCount;
+                    _halfCycleKind = bit ? spec.OneBitHalfCycleKind : spec.ZeroBitHalfCycleKind;
                     _state = State.cycles;
                     break;
 

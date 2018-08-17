@@ -53,8 +53,13 @@
     <Compile Include="Audio\Smooth.cs" />
     <Compile Include="Binary\BinaryReader.cs" />
     <Compile Include="Kansas\AudioToBytes.cs" />
+    <Compile Include="Kansas\AudioToHalfCycleKinds.cs" />
+    <Compile Include="Kansas\FormatSpec.cs" />
     <Compile Include="Kansas\BitsToBytes.cs" />
     <Compile Include="Kansas\AudioToCycleKinds.cs" />
+    <Compile Include="Kansas\BitsToHalfCycleKinds.cs" />
+    <Compile Include="Kansas\BaudSpec.cs" />
+    <Compile Include="Kansas\HalfCycleKindsToAudio.cs" />
     <Compile Include="Microbee\KansasInherit.cs" />
     <Compile Include="Microbee\UnpackData.cs" />
     <Compile Include="Microbee\BlocksToBytes.cs" />
@@ -78,6 +83,7 @@
     <Compile Include="Common\StreamConversion.cs" />
     <Compile Include="Common\CompositeStream.cs" />
     <Compile Include="Common\IStream.cs" />
+    <Compile Include="Sorcerer\AudioToBytes.cs" />
     <Compile Include="Sorcerer\BlocksToBytes.cs" />
     <Compile Include="Sorcerer\BytesToBlocks.cs" />
     <Compile Include="Sorcerer\BytesToTap.cs" />
@@ -97,6 +103,8 @@
     <Compile Include="Sorcerer\TextBlockStreamWriter.cs" />
     <Compile Include="Sorcerer\UnpackData.cs" />
     <Compile Include="Tape\AudioAnalyser.cs" />
+    <Compile Include="Tape\HalfCycleLengthDetector.cs" />
+    <Compile Include="Tape\IHalfCycleKindStream.cs" />
     <Compile Include="Tape\ICycleKindStream.cs" />
     <Compile Include="Common\IStreamExtensions.cs" />
     <Compile Include="Microbee\TextBlockStreamReader.cs" />
@@ -105,6 +113,8 @@
     <Compile Include="Microbee\TextBlockStreamWriter.cs" />
     <Compile Include="Binary\TextByteStreamWriter.cs" />
     <Compile Include="Binary\TextBitStreamReader.cs" />
+    <Compile Include="Tape\TextHalfCycleKindWriter.cs" />
+    <Compile Include="Tape\TextHalfCycleKindReader.cs" />
     <Compile Include="Tape\TextCycleKindReader.cs" />
     <Compile Include="Tape\TextCycleKindWriter.cs" />
     <Compile Include="Tape\CycleLengthDetector.cs" />

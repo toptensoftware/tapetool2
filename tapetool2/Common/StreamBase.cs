@@ -63,7 +63,12 @@ namespace tapetool2
         {
             // Rewind input filter too
             foreach (var x in EnumStreams())
+            {
+                if (x == null)
+                    throw new InvalidOperationException(string.Format("Filter {0} has no input stream", GetType().Name));
+
                 x.Rewind();
+            }
             _position = -1;
             _eof = false;
         }
@@ -113,7 +118,7 @@ namespace tapetool2
         public virtual void Dispose()
         {
             // Also dispose source
-            foreach (var x in EnumStreams())
+            foreach (var x in EnumStreams().Where(x =>x != null))
                 x.Dispose();
         }
 
@@ -151,6 +156,10 @@ namespace tapetool2
                 else if (prop.PropertyType == typeof(char) && value.StartsWith("0x"))
                 {
                     typedValue = (char)Convert.ToUInt16(value.Substring(2), 16);
+                }
+                else if (prop.PropertyType.IsEnum)
+                {
+                    typedValue = Enum.Parse(prop.PropertyType, value);
                 }
                 else
                 {

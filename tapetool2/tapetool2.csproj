@@ -112,6 +112,7 @@
     <Compile Include="Microbee\TextBlockStreamWriter.cs" />
     <Compile Include="Binary\TextByteStreamWriter.cs" />
     <Compile Include="Binary\TextBitStreamReader.cs" />
+    <Compile Include="Tape\ProfileWave.cs" />
     <Compile Include="Tape\TextHalfCycleKindWriter.cs" />
     <Compile Include="Tape\TextHalfCycleKindReader.cs" />
     <Compile Include="Tape\TextCycleKindReader.cs" />

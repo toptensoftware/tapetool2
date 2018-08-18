@@ -10,7 +10,7 @@ namespace tapetool2
     class Program
     {
         const int verMajor = 1;
-        const int verMinor = 0;
+        const int verMinor = 1;
 
         static void ShowLogo()
         {
@@ -98,7 +98,7 @@ namespace tapetool2
 
         static void ShowChain(IStream stm)
         {
-            foreach (var inp in stm.EnumStreams())
+            foreach (var inp in stm.EnumStreams().Where(x=>x != null))
                 ShowChain(inp);
 
             stm.WriteSummary(Console.Out);

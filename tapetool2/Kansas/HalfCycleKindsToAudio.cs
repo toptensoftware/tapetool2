@@ -22,7 +22,7 @@ namespace tapetool2.Kansas
         }
 
         IHalfCycleKindStream _input;
-    
+
         [InputStream]
         public IHalfCycleKindStream Input
         {
@@ -54,6 +54,29 @@ namespace tapetool2.Kansas
             }
         }
 
+        public enum WaveShape
+        {
+            square,
+            sine,
+        }
+
+        [FilterOption("waveShape", "shape of generated waves (square, sine)")]
+        public WaveShape waveShape
+        {
+            get;
+            set;
+        }
+
+        ProfileWave _profileWave;
+        [FilterOption("profileWave", "a wave file containing the wave shape to render from", IsFileName = true)]
+        public string ProfileWave
+        {
+            set
+            {
+                _profileWave = new ProfileWave(value);
+            }
+        }
+
         public int SampleRate
         {
             get
@@ -81,6 +104,7 @@ namespace tapetool2.Kansas
 
         uint _currentSampleNumber;      // in samples
         double _currentCycleTime;       // in seconds
+        HalfCycleKind _currentCycleKind;
         bool _currentSign;
         float _currentSample;
 
@@ -146,7 +170,8 @@ namespace tapetool2.Kansas
 
                 _currentCycleTime += currentCycleLength;
                 currentTimeInCycle = currentTime - _currentCycleTime;
-                currentCycleLength = _input.GetHalfCycleKind() == HalfCycleKind.High ? highCycleTime : lowCycleTime;
+                _currentCycleKind = _input.GetHalfCycleKind();
+                currentCycleLength = _currentCycleKind == HalfCycleKind.High ? highCycleTime : lowCycleTime;
 
                 // Toggle
                 _currentSign = !_currentSign;
@@ -154,7 +179,18 @@ namespace tapetool2.Kansas
 
             _currentSample = _currentSign ? _volume : -_volume;
 
-            _currentSample = (float)(_currentSample * Math.Sin(currentTimeInCycle / currentCycleLength * Math.PI));
+            if (_profileWave != null)
+            {
+                _currentSample = _profileWave.Interopolate(_currentCycleKind, _currentSample, currentTimeInCycle / currentCycleLength) * _volume;
+            }
+            else
+            {
+                // Apply wave shape...
+                if (waveShape == WaveShape.sine)
+                {
+                    _currentSample = (float)(_currentSample * Math.Sin(currentTimeInCycle / currentCycleLength * Math.PI));
+                }
+            }
 
             return true;
         }

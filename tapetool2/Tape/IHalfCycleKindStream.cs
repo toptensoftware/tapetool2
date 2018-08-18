@@ -10,7 +10,7 @@ namespace tapetool2.Tape
     // cycles are of two frequencies - High and Low
     // For Microbee High Freq = 2400Hz, Low = 1200Hz
     // Other enum values are used during parsing audio streams into cycle kinds
-    enum HalfCycleKind
+    public enum HalfCycleKind
     {
         TooHigh,
         High,

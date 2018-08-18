@@ -54,6 +54,17 @@ namespace tapetool2.Kansas
             // Load the first half cycle
             NextHalfCycle();
 
+            // Wait for at least one of each audio cycle kind
+            bool haveLow = false, haveHigh = false;
+            while (!_eof && !(haveLow && haveHigh))
+            {
+                if (CurrentHalfCycleKind() == HalfCycleKind.High)
+                    haveHigh = true;
+                if (CurrentHalfCycleKind() == HalfCycleKind.Low)
+                    haveLow = true;
+                NextHalfCycle();
+            }
+
             // Look for the tail bits pattern
             // NB: For normal 300 baud, this should be 32 high frequency half cycles 
             //  (which corresponds to two 1-bits)

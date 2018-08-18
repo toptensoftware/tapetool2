@@ -11,11 +11,14 @@ namespace tapetool2.Sorcerer
 {
     class StreamConversions
     {
+#if NO
         [StreamConverter]
         public static IBlockStream ConvertTapToBlocks(TapFileReader reader)
         {
             return new BytesToBlocks() { Input = reader };
         }
+
+#endif
 
         [StreamConverter]
         public static IAudioStream ConvertBlocksToAudio(IBlockStream blocks)
@@ -23,11 +26,14 @@ namespace tapetool2.Sorcerer
             return new RenderAudio() { Input = blocks };
         }
 
+#if NO
         [StreamConverter]
         public static IAudioStream ConvertTapFileToAudio(TapFileReader reader)
         {
             return new RenderAudio() { Input = new BytesToBlocks() { Input = reader } };
         }
+
+#endif
 
         [StreamConverter]
         public static IBlockStream ConvertAudioToBlocks(IAudioStream audio)
@@ -35,11 +41,14 @@ namespace tapetool2.Sorcerer
             return new ParseAudio() { Input = audio };
         }
 
+
+#if NO
         [StreamConverter(TargetObjectType = typeof(TapFileWriter))]
         public static IByteStream ConvertAudioToTapFile(IAudioStream audio)
         {
             return new BlocksToBytes() { Input = new ParseAudio() { Input = audio } };
         }
+#endif
 
         [StreamConverter(Namespace = "Exidy Sorcerer")]
         public static IHalfCycleKindStream ConvertAudioToHalfCycleKinds(IAudioStream audio)

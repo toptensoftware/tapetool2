@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using tapetool2.Binary;
 using tapetool2.Tape;
 
+
+#if NO
 namespace tapetool2.Sorcerer
 {
     [Filter("sorcerer.tapToBytes", "Decodes a Exidy Sorcerer tap byte stream")]
@@ -143,3 +145,5 @@ namespace tapetool2.Sorcerer
 
     }
 }
+
+#endif

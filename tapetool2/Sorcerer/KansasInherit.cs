@@ -35,6 +35,10 @@ namespace tapetool2.Sorcerer
         public BitsToHalfCycleKinds()
         {
             SetFormatSpec(Kansas.FormatSpec.Sorcerer);
+            LeadHalfCycleCount = 4800;
+            TailHalfCycleCount = 4800;
+            LeadCycleKind = Tape.HalfCycleKind.High;
+            TailCycleKind = Tape.HalfCycleKind.High;
         }
     }
 

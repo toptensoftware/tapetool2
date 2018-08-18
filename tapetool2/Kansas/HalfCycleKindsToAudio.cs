@@ -81,13 +81,15 @@ namespace tapetool2.Kansas
 
         uint _currentSampleNumber;      // in samples
         double _currentCycleTime;       // in seconds
-        bool _currentSample;
+        bool _currentSign;
+        float _currentSample;
 
         public override void Rewind()
         {
             base.Rewind();
             _currentSampleNumber = 0xFFFFFFFF;
-            _currentSample = false;
+            _currentSample = 0;
+            _currentSign = false;
             _baudSpec = _formatSpec.GetBaudSpec(_baudRate);
         }
 
@@ -112,7 +114,7 @@ namespace tapetool2.Kansas
 
         public float GetSample(int channel)
         {
-            return _currentSample ? _volume : -_volume;
+            return _currentSample;
         }
 
         protected override bool OnNext()
@@ -125,7 +127,8 @@ namespace tapetool2.Kansas
             {
                 // Reset cycle time counter
                 _currentCycleTime = 0;
-                _currentSample = true;
+                _currentSample = 0;
+                _currentSign = false;
 
                 // Read the first cycle kind
                 return _input.Next();
@@ -146,8 +149,12 @@ namespace tapetool2.Kansas
                 currentCycleLength = _input.GetHalfCycleKind() == HalfCycleKind.High ? highCycleTime : lowCycleTime;
 
                 // Toggle
-                _currentSample = !_currentSample;
+                _currentSign = !_currentSign;
             }
+
+            _currentSample = _currentSign ? _volume : -_volume;
+
+            _currentSample = (float)(_currentSample * Math.Sin(currentTimeInCycle / currentCycleLength * Math.PI));
 
             return true;
         }

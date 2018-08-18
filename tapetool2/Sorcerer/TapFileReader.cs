@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using tapetool2.Binary;
 
+
+#if NO
 namespace tapetool2.Sorcerer
 {
     [FileReader("sorcerer.tapFileReader", "Exidy Sorcerer tape file reader", "tap")]
@@ -125,3 +127,4 @@ namespace tapetool2.Sorcerer
         */
     }
 }
+#endif

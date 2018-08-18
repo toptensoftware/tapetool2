@@ -37,14 +37,21 @@ namespace tapetool2.Kansas
 
         enum State
         {
+            leadCycles,     // Before all data
             startBit,
             cycles,
+            tailCycles,     // After all data
         }
 
         State _state;
         int _cyclesLeft;
         HalfCycleKind _halfCycleKind;
         int _baudRate;
+
+        public int LeadHalfCycleCount;
+        public int TailHalfCycleCount;
+        public HalfCycleKind LeadCycleKind;
+        public HalfCycleKind TailCycleKind;
 
         [FilterOption("baud", "Baud rate to render at")]
         public int BaudRate
@@ -58,7 +65,9 @@ namespace tapetool2.Kansas
         public override void Rewind()
         {
             base.Rewind();
-            _state = State.startBit;
+            _state = LeadHalfCycleCount == 0 ? State.startBit : State.leadCycles;
+            _halfCycleKind = LeadCycleKind;
+            _cyclesLeft = LeadHalfCycleCount;
         }
 
         public override IEnumerable<IStream> EnumStreams()
@@ -100,14 +109,35 @@ namespace tapetool2.Kansas
             return _activeBaudSpec;
         }
 
+
         protected override bool OnNext()
         {
             switch (_state)
             {
+                case State.leadCycles:
+                    _cyclesLeft--;
+                    if (_cyclesLeft == 0)
+                    {
+                        _state = State.startBit;
+                    }
+                    break;
+
                 case State.startBit:
                     // Get the next bit
                     if (!_input.Next())
-                        return false;
+                    {
+                        if (TailHalfCycleCount != 0)
+                        {
+                            _state = State.tailCycles;
+                            _halfCycleKind = TailCycleKind;
+                            _cyclesLeft = TailHalfCycleCount;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
                     bool bit = _input.GetSample();
 
                     // Get the spec for this bit
@@ -123,6 +153,14 @@ namespace tapetool2.Kansas
                     _cyclesLeft--;
                     if (_cyclesLeft == 0)
                         _state = State.startBit;
+                    break;
+
+                case State.tailCycles:
+                    if (_cyclesLeft == 0)
+                    {
+                        return false;
+                    }
+                    _cyclesLeft--;
                     break;
 
             }

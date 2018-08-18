@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using tapetool2.Binary;
 
+#if NO
 namespace tapetool2.Sorcerer
 {
     [FileWriter("sorcerer.tapFileWriter", "Mirobee tape file writer", "tap")]
@@ -83,3 +84,5 @@ namespace tapetool2.Sorcerer
         }
     }
 }     
+
+#endif

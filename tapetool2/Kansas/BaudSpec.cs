@@ -22,16 +22,16 @@ namespace tapetool2.Kansas
         public static BaudSpec KansasCityBaud300 = new BaudSpec()
         {
             BaudRate = 300,
-            ZeroBitHalfCycleCount = 8 * 2,
-            OneBitHalfCycleCount = 4 * 2,
+            ZeroBitHalfCycleCount = 4 * 2,
+            OneBitHalfCycleCount = 8 * 2,
         };
 
         // https://en.wikipedia.org/wiki/Kansas_City_standard
         public static BaudSpec KansasCityBaud1200 = new BaudSpec()
         {
             BaudRate = 1200,
-            ZeroBitHalfCycleCount = 2 * 2,
-            OneBitHalfCycleCount = 1 * 2,
+            ZeroBitHalfCycleCount = 1 * 2,
+            OneBitHalfCycleCount = 2 * 2,
         };
 
         public static BaudSpec SorcererBaud1200 = new BaudSpec()

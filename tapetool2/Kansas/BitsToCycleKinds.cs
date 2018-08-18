@@ -46,7 +46,7 @@ namespace tapetool2.Kansas
         CycleKind _cycleKind;
         int _baudRate;
 
-        [FilterOption("baudRate", "Baud rate to render at 0=auto, 300, 600 or 1200")]
+        [FilterOption("baud", "Baud rate to render at 0=auto, 300, 600 or 1200")]
         public int BaudRate
         {
             set
@@ -121,6 +121,7 @@ namespace tapetool2.Kansas
                     if ((_cyclesLeft % 2) != 0)
                         throw new InvalidOperationException("Half-cycles not supported");
                     _cyclesLeft /= 2;
+                    _cyclesLeft--;
 
                     // What kind of cycles?
                     if ((bit ? baudSpec.OneBitHalfCycleKind : baudSpec.ZeroBitHalfCycleKind) == HalfCycleKind.Low)
@@ -129,7 +130,7 @@ namespace tapetool2.Kansas
                         _cycleKind = CycleKind.High;
 
                     // Switch state
-                    _state = State.cycles;
+                    _state = _cyclesLeft > 0 ? State.cycles : State.startBit;
                     break;
 
                 case State.cycles:

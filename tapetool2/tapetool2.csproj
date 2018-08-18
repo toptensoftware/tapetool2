@@ -83,7 +83,6 @@
     <Compile Include="Common\StreamConversion.cs" />
     <Compile Include="Common\CompositeStream.cs" />
     <Compile Include="Common\IStream.cs" />
-    <Compile Include="Sorcerer\AudioToBytes.cs" />
     <Compile Include="Sorcerer\BlocksToBytes.cs" />
     <Compile Include="Sorcerer\BytesToBlocks.cs" />
     <Compile Include="Sorcerer\BytesToTap.cs" />

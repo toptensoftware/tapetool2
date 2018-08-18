@@ -28,6 +28,7 @@ namespace tapetool2.Sorcerer
             leadIn,
             header,
             headerChecksum,
+            dataLeadIn,
             block,
             blockChecksum,
         }
@@ -62,6 +63,9 @@ namespace tapetool2.Sorcerer
 
                 case State.headerChecksum:
                     return _input.Header.Checksum;
+
+                case State.dataLeadIn:
+                    return (byte)(_stateByteIndex == 63 ? 0x01 : 0x00);
 
                 case State.block:
                     return _input.GetBlock().Data[_stateByteIndex];
@@ -111,12 +115,20 @@ namespace tapetool2.Sorcerer
                     return true;
 
                 case State.headerChecksum:
-                case State.blockChecksum:
                     if (!_input.Next())
                         return false;
 
                     _stateByteIndex = 0;
-                    _state = State.block;
+                    _state = State.dataLeadIn;
+                    return true;
+
+                case State.dataLeadIn:
+                    _stateByteIndex++;
+                    if (_stateByteIndex == 64)
+                    {
+                        _state = State.block;
+                        _stateByteIndex = 0;
+                    }
                     return true;
 
                 case State.block:
@@ -127,6 +139,14 @@ namespace tapetool2.Sorcerer
                         _state = State.blockChecksum;
                     }
 
+                    return true;
+
+                case State.blockChecksum:
+                    if (!_input.Next())
+                        return false;
+
+                    _stateByteIndex = 0;
+                    _state = State.block;
                     return true;
             }
             return false;

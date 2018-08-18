@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace tapetool2.Sorcerer
 {
+    [Filter("sorcerer.audioToBytes", "Parses an Exidy Sorcerer tape audio stream into a bytes")]
+    class AudioToBytes : Kansas.AudioToBytes
+    {
+        public AudioToBytes()
+        {
+            SetFormatSpec(Kansas.FormatSpec.Sorcerer);
+        }
+    }
+
     [Filter("sorcerer.audioToHalfCycleKinds", "Generates Exidy Sorcerer audio half-cycles from an audio stream")]
     class AudioToHalfCycleKinds : Kansas.AudioToHalfCycleKinds
     {

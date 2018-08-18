@@ -70,7 +70,7 @@ namespace tapetool2
 
         public virtual IStream UpstreamOfType(Type t)
         {
-            foreach (var p in EnumStreams())
+            foreach (var p in EnumStreams().Where(x => x != null))
             {
                 if (t.IsAssignableFrom(p.GetType()))
                     return p;
@@ -143,7 +143,20 @@ namespace tapetool2
             if (value == null && prop.PropertyType == typeof(bool))
                 typedValue = true;
             else
-                typedValue = Convert.ChangeType(value, prop.PropertyType);
+            {
+                if (prop.PropertyType == typeof(ushort) && value.StartsWith("0x"))
+                {
+                    typedValue = Convert.ToUInt16(value.Substring(2), 16);
+                }
+                else if (prop.PropertyType == typeof(char) && value.StartsWith("0x"))
+                {
+                    typedValue = (char)Convert.ToUInt16(value.Substring(2), 16);
+                }
+                else
+                {
+                    typedValue = Convert.ChangeType(value, prop.PropertyType);
+                }
+            }
 
             // Set it
             prop.SetValue(this, typedValue);

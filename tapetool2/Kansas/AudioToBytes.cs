@@ -18,7 +18,13 @@ namespace tapetool2.Kansas
         }
 
         protected IAudioStream _input;
-    
+
+        FormatSpec _formatSpec = FormatSpec.KansasCity;
+        public void SetFormatSpec(FormatSpec spec)
+        {
+            _formatSpec = spec;
+        }
+
         [InputStream]
         public IAudioStream Input
         {
@@ -29,10 +35,6 @@ namespace tapetool2.Kansas
             }
         }
 
-        protected const int TAPE_SPEED_300 = 4;
-        protected const int TAPE_SPEED_600 = 2;
-        protected const int TAPE_SPEED_1200 = 1;
-
         public override void Rewind()
         {
             base.Rewind();
@@ -42,26 +44,26 @@ namespace tapetool2.Kansas
             // 300 baud till proven otherwise
             SetBaudRate(_userBaud);
 
-            // Minimum number of samples in a low frequency half cycle
-            // Microbee PC85 ROM uses 1500Hz as the cut off for a low frequency cycle
-            // ie: rom uses a count of 28 with high frequency cycles typically measuring 16 and 
-            //     low frequency cycles typically measuring 32).
-            _cutOffSamples = (_input.SampleRate / _cutoffFrequency) / 2;
-
             // Skip lead-in noise (wait for any signal outside the noise threshold)
             _input.Next();
-            while (SignOfSample(_input.GetSample(0))==0)
+            while (!_eof && SignOfSample(_input.GetSample(0))==0)
             {
                 _input.Next();
             };
 
-            // Look for at least 16 short half cycles
-            for (int i=0; i<16; i++)
+            // Load the first half cycle
+            NextHalfCycle();
+
+            // Look for the tail bits pattern
+            // NB: For normal 300 baud, this should be 32 high frequency half cycles 
+            //  (which corresponds to two 1-bits)
+            for (int i=0; i<_tailBitPattern.Count && !_eof; i++)
             {
-                while (ReadHalfCycleLength() >= _cutOffSamples)
+                if (CurrentHalfCycleKind() != _tailBitPattern[i])
                 {
-                    i = 0;
+                    i = -1;
                 }
+                NextHalfCycle();
             }
         }
 
@@ -73,17 +75,6 @@ namespace tapetool2.Kansas
             set
             {
                 _noiseThreshold = value;
-            }
-        }
-
-        int _cutoffFrequency = 1500;
-
-        [FilterOption("cutoffFrequency", "frequency cutoff between high and low frequency cycles (default=1500Hz)")]
-        public int cutoffFrequency
-        {
-            set
-            {
-                _cutoffFrequency = value;
             }
         }
 
@@ -118,7 +109,7 @@ namespace tapetool2.Kansas
         // Measure the length of the next half cycle
         // (ie: number of samples before sign of current sample changes)
         protected bool _eof;
-        protected int ReadHalfCycleLength()
+        protected int _ReadHalfCycleLength()
         {
             if (_eof)
                 return -1;
@@ -143,29 +134,48 @@ namespace tapetool2.Kansas
             return halfCycleLength;
         }
 
+        int _currentHalfCycleLength;
+        int NextHalfCycle()
+        {
+            _currentHalfCycleLength = _ReadHalfCycleLength();
+            return _currentHalfCycleLength;
+        }
+
+        HalfCycleKind CurrentHalfCycleKind()
+        {
+            if (_currentHalfCycleLength < 0)
+                return HalfCycleKind.TooHigh;
+            return _currentHalfCycleLength < _cutOffSamples ? HalfCycleKind.High : HalfCycleKind.Low;
+        }
+
         public virtual byte ReadBit()
         {
-            ReadHalfCycleLength();
-
             // Sum up cycle lengths
             int sum = 0;
-            for (int i = 0; i < _tapeSpeed; i++)
+            for (int i = 0; i < _cycleSumCount; i++)
             {
-                sum += ReadHalfCycleLength();
+                sum += _currentHalfCycleLength;
+                NextHalfCycle();
             }
 
             if (_eof)
                 return 0;
 
-            sum /= _tapeSpeed;
-
             // What kind of bit?
-            byte bit = (byte)((sum < _cutOffSamples) ? 0x80 : 0x00);
+            byte bit;
+            if (sum < _cutOffSamples * _cycleSumCount)
+            {
+                bit = _highFreqBit;
+            }
+            else
+            {
+                bit = _lowFreqBit;
+            }
 
             // Skip the rest of the cycles
-            int halfCyclesLeft = _tapeSpeed * (bit != 0 ? 4 : 2) - _tapeSpeed - 1;
-            for (int i = 0; i < halfCyclesLeft; i++)
-                ReadHalfCycleLength();
+            int cyclesRemaining = (bit == 0 ? _baudSpec.ZeroBitHalfCycleCount : _baudSpec.OneBitHalfCycleCount) - _cycleSumCount;
+            for (int i = 0; i < cyclesRemaining; i++)
+                NextHalfCycle();
 
             // Return the bit
             return bit;
@@ -177,9 +187,17 @@ namespace tapetool2.Kansas
             yield return _input;
         }
 
-        protected int _tapeSpeed;         // 1 = 1200, 2 = 600, 4 = 300
+        protected BaudSpec _baudSpec;
+        List<HalfCycleKind> _leadBitPattern;
+        List<HalfCycleKind> _tailBitPattern;
+        int _cycleSumCount;
+        byte _highFreqBit;
+        byte _lowFreqBit;
+
         protected int _cutOffSamples;
         protected byte _currentByte;
+        HalfCycleKind _byteSyncCycleKind1;
+        HalfCycleKind _byteSyncCycleKind2;
 
         public int GetCurrentBaudRate()
         {
@@ -201,15 +219,21 @@ namespace tapetool2.Kansas
 
             // Skip any long cycles - should never happen as we should already be
             // in the tail cycles of the last byte, but this might help to resync
-            while (ReadHalfCycleLength() >= _cutOffSamples)
+            if (_byteSyncCycleKind1 != HalfCycleKind.Indeterminate)
             {
-                // nop
+                while (CurrentHalfCycleKind() == _byteSyncCycleKind1)
+                {
+                    NextHalfCycle();
+                }
             }
 
-            // Skip short cycles at end of last byte
-            while (ReadHalfCycleLength() < _cutOffSamples && !_eof)
+            // Skip the tail bits of the previous byte
+            if (_byteSyncCycleKind2 != HalfCycleKind.Indeterminate)
             {
-                // nop
+                while (CurrentHalfCycleKind() == _byteSyncCycleKind2)
+                {
+                    NextHalfCycle();
+                }
             }
 
             // EOF?
@@ -218,10 +242,14 @@ namespace tapetool2.Kansas
 
             var samplePos = ((StreamBase)_input).Position;
 
-            // Skip the rest of the leading zero bit
-            for (int i=0; i < _tapeSpeed * 2 - 1; i++)
+            // Skip the lead bit pattern
+            for (int i = 0; i < _leadBitPattern.Count; i++)
             {
-                ReadHalfCycleLength();
+                if (CurrentHalfCycleKind() != _leadBitPattern[i])
+                {
+                    Console.WriteLine("Warning: lead bit pattern mismatch, ignoring");
+                }
+                NextHalfCycle();
             }
 
             // Read 8 bits
@@ -260,24 +288,86 @@ namespace tapetool2.Kansas
 
         void SetBaudRate(int baudRate)
         {
-            switch (baudRate)
+            // Get the baud spec
+            _baudSpec = _formatSpec.GetBaudSpec(baudRate == 0 ? 300 : baudRate);
+
+            // Must have lead and tail bits
+            if (_baudSpec.leadBits.Length < 1 ||
+                _baudSpec.tailBits.Length < 1)
+                throw new InvalidOperationException("Unsupported lead/tail bit specification");
+
+            // Lead and tail bits must be different
+            if (_baudSpec.leadBits[0] == _baudSpec.tailBits[0])
+                throw new InvalidOperationException("Unsupported lead/tail bit specification");
+
+            // All the lead bits must be the same
+            if (_baudSpec.leadBits.Distinct().Count() != 1)
+                throw new InvalidOperationException("Unsupported lead/tail bit specification");
+
+            // All the tail bits must be the same
+            if (_baudSpec.tailBits.Distinct().Count() != 1)
+                throw new InvalidOperationException("Unsupported lead/tail bit specification");
+
+            // Minimum number of samples in a low frequency half cycle
+            // Microbee PC85 ROM uses 1500Hz as the cut off for a low frequency cycle
+            // ie: rom uses a count of 28 with high frequency cycles typically measuring 16 and 
+            //     low frequency cycles typically measuring 32).
+            _cutOffSamples = (_input.SampleRate / (_baudSpec.LowFrequency * 3 / 2)) / 2;
+
+            // Work out the cycle kinds to skip at the start of each byte to resync
+            _byteSyncCycleKind1 = _baudSpec.leadBits[0] ? _baudSpec.OneBitHalfCycleKind : _baudSpec.ZeroBitHalfCycleKind;
+            _byteSyncCycleKind2 = _baudSpec.tailBits[0] ? _baudSpec.OneBitHalfCycleKind : _baudSpec.ZeroBitHalfCycleKind;
+
+            // Work out the lead bit pattern
+            _leadBitPattern = new List<HalfCycleKind>();
+            for (int i = 0; i < _baudSpec.leadBits.Length; i++)
             {
-                case 0:
-                case 300:
-                    _tapeSpeed = TAPE_SPEED_300;
-                    break;
-
-                case 600:
-                    _tapeSpeed = TAPE_SPEED_600;
-                    break;
-
-                case 1200:
-                    _tapeSpeed = TAPE_SPEED_1200;
-                    break;
-
-                default:
-                    throw new InvalidOperationException(string.Format("Invalid baud rate ({0})", baudRate));
+                if (_baudSpec.leadBits[i])
+                {
+                    _leadBitPattern.AddRange(Enumerable.Repeat<HalfCycleKind>(_baudSpec.OneBitHalfCycleKind, _baudSpec.OneBitHalfCycleCount));
+                }
+                else
+                {
+                    _leadBitPattern.AddRange(Enumerable.Repeat<HalfCycleKind>(_baudSpec.ZeroBitHalfCycleKind, _baudSpec.ZeroBitHalfCycleCount));
+                }
             }
+
+            // Work out the tail bit pattern
+            _tailBitPattern = new List<HalfCycleKind>();
+            for (int i = 0; i < _baudSpec.tailBits.Length; i++)
+            {
+                if (_baudSpec.tailBits[i])
+                {
+                    _tailBitPattern.AddRange(Enumerable.Repeat<HalfCycleKind>(_baudSpec.OneBitHalfCycleKind, _baudSpec.OneBitHalfCycleCount));
+                }
+                else
+                {
+                    _tailBitPattern.AddRange(Enumerable.Repeat<HalfCycleKind>(_baudSpec.ZeroBitHalfCycleKind, _baudSpec.ZeroBitHalfCycleCount));
+                }
+            }
+
+            if (_baudSpec.OneBitHalfCycleKind == HalfCycleKind.High)
+            {
+                _highFreqBit = 0x80;
+                _lowFreqBit = 0x00;
+            }
+            else
+            {
+                _highFreqBit = 0x00;
+                _lowFreqBit = 0x80;
+            }
+
+
+            if (_baudSpec.OneBitHalfCycleCount < _baudSpec.ZeroBitHalfCycleCount)
+            {
+                _cycleSumCount = _baudSpec.OneBitHalfCycleCount / 2;
+            }
+            else
+            {
+                _cycleSumCount = _baudSpec.ZeroBitHalfCycleCount / 2;
+            }
+            if (_cycleSumCount < 1)
+                _cycleSumCount = 1;
         }
     }
 }

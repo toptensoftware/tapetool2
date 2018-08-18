@@ -36,7 +36,6 @@ namespace tapetool2.Kansas
         }
 
         int _currentBaudRate = 300;
-
         int IBaudRateProvider.BaudRate
         {
             get

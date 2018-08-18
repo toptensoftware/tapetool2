@@ -85,9 +85,21 @@ namespace tapetool2.Sorcerer
                 var b = headerBytes[i];
                 _tw.Write("{0} ", FormatByte(b));
             }
-
             _tw.WriteLine();
             _tw.WriteLine("[Checksum]  {0}", FormatByte(_input.Header.Checksum));
+
+
+            _tw.WriteLine();
+            _tw.Write("[lead-in]\n");
+            _tw.Write("[bytes]     ");
+            headerBytes = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+            for (int i = 0; i < headerBytes.Length; i++)
+            {
+                var b = headerBytes[i];
+                _tw.Write("{0} ", FormatByte(b));
+            }
+            _tw.WriteLine();
+
 
         }
 

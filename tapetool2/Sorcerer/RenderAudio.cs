@@ -12,7 +12,6 @@ namespace tapetool2.Sorcerer
     {
         public RenderAudio()
         {
-            Add(new SetHeader());
             Add(new BlocksToBytes());
             Add(new BytesToBits());
             Add(new BitsToHalfCycleKinds());

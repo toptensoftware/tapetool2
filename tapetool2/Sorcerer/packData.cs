@@ -95,7 +95,7 @@ namespace tapetool2.Sorcerer
 
             // How many bytes in this block
             var bytesInBlock = Math.Min((ushort)(_header.datalen - _blockAddress), (ushort)0x100);
-            var checksum = (byte)bytesInBlock;
+            var checksum = (byte)0;
 
             // Read bytes
             var data = new byte[bytesInBlock];
@@ -103,14 +103,14 @@ namespace tapetool2.Sorcerer
             {
                 CheckedNext();
                 data[i] = _input.GetByte();
-                checksum += data[i];
+                checksum = (byte)(0xFF - (byte)(data[i] - checksum));
             }
 
             // Create the block
             var block = new Block();
             block.Address = _blockAddress;
             block.Data = data;
-            block.Checksum = (byte)(0x100 - checksum);
+            block.Checksum = checksum;
 
             _currentBlock = block;
             _blockAddress += 0x100;

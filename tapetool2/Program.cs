@@ -113,13 +113,14 @@ namespace tapetool2
             if (stm.SetArgument(name, value))
                 return true;
 
+            bool handled = false;
             foreach (var p in stm.EnumStreams())
             {
                 if (SetArgument(stopPos, p, name, value))
-                    return true;
+                    handled |= true;
             }
 
-            return false;
+            return handled;
         }
 
         static IStream nextToLastStream;
@@ -205,7 +206,10 @@ namespace tapetool2
                 {
                     _usingNamespaces.Add(SwitchName);
                     _usingNamespaces.AddRange(FilterInfo.GetInheritedNamespaces(SwitchName));
+                    return;
                 }
+
+                throw new InvalidOperationException(string.Format("Unknown or inapplicable switch: {0}", SwitchName));
             }
             else
             {

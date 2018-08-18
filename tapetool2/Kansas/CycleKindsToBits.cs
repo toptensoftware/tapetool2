@@ -35,7 +35,7 @@ namespace tapetool2.Kansas
         bool _currentBit;
         List<CycleKind> _leadCycles;
 
-        [FilterOption("baudRate", "Baud rate to parse at 0=auto, 300, 600 or 1200")]
+        [FilterOption("baud", "Baud rate to parse at 0=auto, 300, 600 or 1200")]
         public int BaudRate
         {
             set

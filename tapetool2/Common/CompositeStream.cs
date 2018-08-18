@@ -62,14 +62,13 @@ namespace tapetool2
 
         public virtual bool SetArgument(string name, string value)
         {
-            /*
+            bool handled = false;
             for (int i = _chain.Count - 1; i >= 0; i--)
             {
                 if (_chain[i].SetArgument(name, value))
-                    return true;
+                    handled = true;
             }
-            */
-            return false;
+            return handled;
         }
 
         public IEnumerable<FilterOptionAttribute> GetOptions()

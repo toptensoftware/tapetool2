@@ -38,7 +38,7 @@ namespace tapetool2.Sorcerer
             }
             set
             {
-                _filename = Encoding.ASCII.GetBytes((value + "      ").Substring(0, 6));
+                _filename = Encoding.ASCII.GetBytes((value + "      ").Substring(0, 5));
             }
         }
 
@@ -74,7 +74,12 @@ namespace tapetool2.Sorcerer
         {
             get
             {
-                return (byte)(0x100 - (byte)(ToBytes().Select(x => (int)x).Sum() + 16));
+                byte checksum = 0;
+                foreach (var data in ToBytes())
+                {
+                    checksum = (byte)(0xFF - (byte)(data - checksum));
+                }
+                return checksum;
             }
         }
     }

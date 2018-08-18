@@ -98,7 +98,7 @@ namespace tapetool2.Kansas
 
         BaudSpec _baudSpec;
         int _baudRate = 300;
-        [FilterOption("baudRate", "baud rate (default=300)")]
+        [FilterOption("baud", "baud rate (default=300)")]
         public int baudRate
         {
             set

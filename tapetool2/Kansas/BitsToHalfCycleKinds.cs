@@ -46,7 +46,7 @@ namespace tapetool2.Kansas
         HalfCycleKind _halfCycleKind;
         int _baudRate;
 
-        [FilterOption("baudRate", "Baud rate to render at")]
+        [FilterOption("baud", "Baud rate to render at")]
         public int BaudRate
         {
             set
@@ -114,9 +114,9 @@ namespace tapetool2.Kansas
                     var spec = ResolveBaudSpec();
 
                     // Setup for cycles
-                    _cyclesLeft = bit ? spec.OneBitHalfCycleCount : spec.ZeroBitHalfCycleCount;
+                    _cyclesLeft = (bit ? spec.OneBitHalfCycleCount : spec.ZeroBitHalfCycleCount) - 1;
                     _halfCycleKind = bit ? spec.OneBitHalfCycleKind : spec.ZeroBitHalfCycleKind;
-                    _state = State.cycles;
+                    _state = _cyclesLeft > 0 ? State.cycles : State.startBit;
                     break;
 
                 case State.cycles:

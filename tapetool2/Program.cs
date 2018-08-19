@@ -11,11 +11,12 @@ namespace tapetool2
     {
         const int verMajor = 1;
         const int verMinor = 1;
+        const int build = 1100;
 
         static void ShowLogo()
         {
             // Show some help
-            Console.WriteLine("tapetool2 v{0}.{1} - Microbee/Sorcerer Tape Diagnotic Utility", verMajor, verMinor);
+            Console.WriteLine("tapetool2 v{0}.{1}.{2} - Microbee/Sorcerer Tape Diagnotic Utility", verMajor, verMinor, build);
             Console.WriteLine("Copyright (C) 2017-2018 Topten Software.\n");
         }
 

@@ -43,8 +43,6 @@ namespace tapetool2.Sorcerer
         ushort? _datalen;
         ushort? _loadaddr;
         ushort? _startaddr;
-        byte? _speed;
-        byte? _autostart;
 
         [FilterOption("filename", "Sets or overrides the header filename")]
         public string Filename
@@ -80,18 +78,6 @@ namespace tapetool2.Sorcerer
         public ushort StartAddress
         {
             set { _startaddr = value; }
-        }
-
-        [FilterOption("speed", "Sets or overrides the header speed field")]
-        public byte Speed
-        {
-            set { _speed = value; }
-        }
-
-        [FilterOption("autoStart", "Sets or overrides the header auto-start field")]
-        public byte AutoStart
-        {
-            set { _autostart = value; }
         }
 
         [InputStream]

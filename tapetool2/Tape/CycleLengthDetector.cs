@@ -9,6 +9,7 @@ namespace tapetool2.Tape
     public enum CycleLengthMethod
     {
         Auto,
+        ZeroCrossing,           // Half cycles
         ZeroCrossingUp,
         ZeroCrossingDown,
         PositiveDutyLength,
@@ -27,6 +28,7 @@ namespace tapetool2.Tape
         {
             switch (str.ToLowerInvariant())
             {
+                case "zc": return CycleLengthMethod.ZeroCrossing;
                 case "zc+": return CycleLengthMethod.ZeroCrossingUp;
                 case "zc-": return CycleLengthMethod.ZeroCrossingDown;
                 case "duty+": return CycleLengthMethod.PositiveDutyLength;
@@ -75,7 +77,12 @@ namespace tapetool2.Tape
 
             bool crossedFull;
             bool crossedHalf;
-            if (Method != CycleLengthMethod.ZeroCrossingDown)
+            if (Method == CycleLengthMethod.ZeroCrossing)
+            {
+                crossedFull = crossedUp || crossedDown;
+                crossedHalf = crossedUp;
+            }
+            else if (Method != CycleLengthMethod.ZeroCrossingDown)
             {
                 crossedFull = crossedUp;
                 crossedHalf = crossedDown;

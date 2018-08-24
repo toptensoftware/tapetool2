@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace tapetool2.Binary
+namespace tapetool2.Tape
 {
-    [FileReader("textBitStreamReader", "Text bit-stream file reader", ".bits.txt")]
-    class TextBitStreamReader : StreamBase, IBitStream
+    [FileReader("textCycleLengthReader", "Text cycle-length file reader", ".cyclelen.txt")]
+    class TextCycleLengthReader : StreamBase, ICycleLengthStream
     {
-        public TextBitStreamReader()
+        public TextCycleLengthReader()
         {
         }
 
@@ -23,7 +23,7 @@ namespace tapetool2.Binary
         }
 
         TextReader _reader;
-        TextCharParser _parser;
+        TextIntParser _parser;
 
         public override void Rewind()
         {
@@ -33,7 +33,10 @@ namespace tapetool2.Binary
             Close();
 
             _reader = new StreamReader(Filename);
-            _parser = new TextCharParser(_reader);
+            _parser = new TextIntParser(_reader);
+
+            // Consume the sample rate
+            _sampleRate = _parser.Next().Value;
         }
 
         public override IEnumerable<IStream> EnumStreams()
@@ -41,35 +44,16 @@ namespace tapetool2.Binary
             yield break;
         }
 
-        bool _currentBit;
+        int _sampleRate;
+        int? _currentCycleLength;
 
-        public bool GetSample()
-        {
-            return _currentBit;
-        }
+        public int SampleRate => _sampleRate;
+        public int CurrentCycleLength => _currentCycleLength.Value;
 
         protected override bool OnNext()
         {
-            char ch = _parser.Next();
-
-            if (ch == '\0')
-                return false;
-
-            switch (ch)
-            {
-                case '1':
-                    _currentBit = true;
-                    break;
-
-                case '0':
-                    _currentBit = false;
-                    break;
-
-                default:
-                    throw new InvalidDataException(string.Format("Invalid character in text bit-stream file: '{0}'", ch));
-            }
-
-            return true;
+            _currentCycleLength = _parser.Next();
+            return _currentCycleLength.HasValue;    
         }
 
         void Close()

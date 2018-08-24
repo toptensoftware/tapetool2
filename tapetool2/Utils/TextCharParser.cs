@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace tapetool2
 {
-    class TextParser
+    class TextCharParser
     {
-        public TextParser(TextReader input)
+        public TextCharParser(TextReader input)
         {
             _input = input;
         }

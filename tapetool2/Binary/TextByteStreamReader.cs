@@ -23,7 +23,7 @@ namespace tapetool2.Binary
         }
 
         TextReader _reader;
-        TextParser _parser;
+        TextCharParser _parser;
 
         public override void Rewind()
         {
@@ -33,7 +33,7 @@ namespace tapetool2.Binary
             Close();
 
             _reader = new StreamReader(Filename);
-            _parser = new TextParser(_reader);
+            _parser = new TextCharParser(_reader);
         }
 
         public override IEnumerable<IStream> EnumStreams()

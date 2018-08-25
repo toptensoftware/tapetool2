@@ -37,31 +37,47 @@ namespace tapetool2.Trs80
             _leadByteFound = false;
             _currentByte = 0xFF;
             int skippedZeroBits = 0;
-            while (true)
+
+            if (NoSync)
             {
-                // Read next bit
-                if (!_input.Next())
-                    return;
-
-                // Count how many zero bits we skipped
-                if ((_currentByte & 0x80) == 0)
-                    skippedZeroBits++;
-                else
-                    skippedZeroBits = 0;
-
-                // Update the current byte
-                _currentByte = (byte)(_currentByte << 1 | (_input.GetSample() ? 0x01 : 0x00));
-
-                // Is it the lead byte
-                if (_currentByte == 0xA5)
-                {
-                    _leadByteFound = true;
-                    break;
-                }
+                _leadByteFound = true;
+                _leadingZeroCount = 0;
             }
+            else
+            {
+                while (true)
+                {
+                    // Read next bit
+                    if (!_input.Next())
+                        return;
 
-            // How many leading zeros were there?
-            _leadingZeroCount = skippedZeroBits / 8;
+                    // Count how many zero bits we skipped
+                    if ((_currentByte & 0x80) == 0)
+                        skippedZeroBits++;
+                    else
+                        skippedZeroBits = 0;
+
+                    // Update the current byte
+                    _currentByte = (byte)(_currentByte << 1 | (_input.GetSample() ? 0x01 : 0x00));
+
+                    // Is it the lead byte
+                    if (_currentByte == 0xA5)
+                    {
+                        _leadByteFound = true;
+                        break;
+                    }
+                }
+
+                // How many leading zeros were there?
+                _leadingZeroCount = skippedZeroBits / 8;
+            }
+        }
+
+        [FilterOption("nosync", "Don't wait for lead-in sync byte")]
+        public bool NoSync
+        {
+            get;
+            set;
         }
 
         public override IEnumerable<IStream> EnumStreams()
@@ -76,26 +92,30 @@ namespace tapetool2.Trs80
 
         protected override bool OnNext()
         {
-            // Did we find the lead byte
-            if (!_leadByteFound)
-                return false;
-
-            // Have we sent all the leading zeroes?
-            if (_leadingZeroCount > 0)
+            if (!NoSync)
             {
-                _leadingZeroCount--;
-                _currentByte = 0;
-                return true;
+                // Did we find the lead byte
+                if (!_leadByteFound)
+                    return false;
+
+                // Have we sent all the leading zeroes?
+                if (_leadingZeroCount > 0)
+                {
+                    _leadingZeroCount--;
+                    _currentByte = 0;
+                    return true;
+                }
+
+                // Has the lead 0xA5 byte been sent?
+                if (!_leadByteSent)
+                {
+                    _leadByteSent = true;
+                    _currentByte = 0xA5;
+                    return true;
+                }
             }
 
-            // Has the lead 0xA5 byte been sent?
-            if (!_leadByteSent)
-            {
-                _leadByteSent = true;
-                _currentByte = 0xA5;
-                return true;
-            }
-
+            var prevByte = _currentByte;
             // Read next 8 bits for the next byte
             _currentByte = 0;
             for (int i = 0; i < 8; i++)

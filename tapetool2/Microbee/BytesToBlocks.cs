@@ -114,7 +114,7 @@ namespace tapetool2.Microbee
         public void CheckedNext()
         {
             if (!_input.Next())
-                throw new InvalidDataException("Unexpected EOF in tap stream");
+                throw new InvalidDataException("Unexpected EOF in byte stream");
         }
 
         protected override bool OnNext()

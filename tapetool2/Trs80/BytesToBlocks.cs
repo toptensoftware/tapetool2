@@ -26,33 +26,38 @@ namespace tapetool2.Trs80
             set { _input = value; }
         }
 
-        string _filename;
-        public string FileName => _filename;
+        Header _header;
 
-        FileType _filetype;
-        public FileType FileType => _filetype;
+        public Header Header => _header;
+
+        public bool SkipLeadin = true;
 
         public override void Rewind()
         {
             base.Rewind();
 
             // Find the header byte
-            while (true)
+            if (SkipLeadin)
             {
-                CheckedNext();
-                if (_input.GetByte() == 0xA5)
-                    break;
+                while (true)
+                {
+                    CheckedNext();
+                    if (_input.GetByte() == 0xA5)
+                        break;
+                }
             }
 
             // Skip the header byte
             CheckedNext();
+
+            _header = new Header();
 
             var filename = new StringBuilder();
             int filenameLength = 6;
             switch (_input.GetByte())
             {
                 case 0x55:
-                    _filetype = FileType.System;
+                    _header.FileType = FileType.System;
                     break;
 
                 case 0xD3:
@@ -64,13 +69,13 @@ namespace tapetool2.Trs80
                         {
                             throw new InvalidOperationException("Invalid header, found 2 0xD3 bytes, expected a third");
                         }
-                        _filetype = FileType.Basic;
+                        _header.FileType = FileType.Basic;
                         filenameLength = 1;
                     }
                     else
                     {
                         // We've already read the first character of the filename
-                        _filetype = FileType.Text;
+                        _header.FileType = FileType.Text;
                         filename.Append((char)_input.GetByte());
                     }
                     break;
@@ -86,15 +91,12 @@ namespace tapetool2.Trs80
                 filename.Append((char)_input.GetByte());
                 CheckedNext();
             }
-            _filename = filename.ToString();
+            _header.FileName = filename.ToString();
         }
 
         Block _currentBlock;
 
-        public Block GetBlock()
-        {
-            return _currentBlock;
-        }
+        public Block CurrentBlock => _currentBlock;
 
         public override IEnumerable<IStream> EnumStreams()
         {
@@ -110,7 +112,7 @@ namespace tapetool2.Trs80
                 _captureBytes.Add(_input.GetByte());
 
             if (!_input.Next())
-                throw new InvalidDataException("Unexpected EOF in tap stream");
+                throw new InvalidDataException("Unexpected EOF in byte stream");
         }
 
         protected override bool OnNext()
@@ -121,7 +123,7 @@ namespace tapetool2.Trs80
 
             _captureBytes = new List<byte>();
 
-            switch (_filetype)
+            switch (_header.FileType)
             {
                 case FileType.System:
                     if (_input.GetByte() == 0x3C)
@@ -238,6 +240,7 @@ namespace tapetool2.Trs80
             int addr = _input.GetByte();
             CheckedNext();
             addr = _input.GetByte() << 8 | addr;
+            _captureBytes.Add(_input.GetByte());
             _input.Next();
 
             return new EntryPointAddressBlock()

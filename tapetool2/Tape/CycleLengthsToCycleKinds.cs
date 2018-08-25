@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using tapetool2.Audio;
 using tapetool2.Tape;
 
-namespace tapetool2.Kansas
+namespace tapetool2.Tape
 {
     [Filter("cycleLengthsToCycleKinds", "Generates cycle-kinds from cycle-lengths")]
     class CycleLengthsToCycleKinds : StreamBase, ICycleKindStream

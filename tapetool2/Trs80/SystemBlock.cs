@@ -28,6 +28,19 @@ namespace tapetool2.Trs80
     {
         public ushort Address { get; set; }
         public byte[] Data { get; set; }
+
+        public byte Checksum
+        {
+            get
+            {
+                byte checksum = 0;
+                checksum += (byte)(Address & 0xFF);
+                checksum += (byte)((Address >> 8) & 0xFF);
+                foreach (var b in Data)
+                    checksum += b;
+                return checksum;
+            }
+        }
     }
 
     class EntryPointAddressBlock : Block

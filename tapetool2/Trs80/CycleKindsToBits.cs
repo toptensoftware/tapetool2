@@ -35,21 +35,31 @@ namespace tapetool2.Trs80
             base.Rewind();
 
             // Wait for at least 16 low freq cycles
-            int count = 0;
-            while (count < 16)
+            if (!NoSync)
             {
-                if (!_input.Next())
-                    break;      // eof
+                int count = 0;
+                while (count < 16)
+                {
+                    if (!_input.Next())
+                        break;      // eof
 
-                if (_input.GetCycleKind() != CycleKind.Low)
-                {
-                    count = 0;
-                }
-                else
-                {
-                    count++;
+                    if (_input.GetCycleKind() != CycleKind.Low)
+                    {
+                        count = 0;
+                    }
+                    else
+                    {
+                        count++;
+                    }
                 }
             }
+        }
+
+        [FilterOption("nosync", "Don't wait for lead-in sync")]
+        public bool NoSync
+        {
+            get;
+            set;
         }
 
         public override IEnumerable<IStream> EnumStreams()

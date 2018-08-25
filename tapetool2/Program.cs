@@ -10,13 +10,13 @@ namespace tapetool2
     class Program
     {
         const int verMajor = 1;
-        const int verMinor = 1;
-        const int build = 1100;
+        const int verMinor = 2;
+        const int build = 1200;
 
         static void ShowLogo()
         {
             // Show some help
-            Console.WriteLine("tapetool2 v{0}.{1}.{2} - Microbee/Sorcerer Tape Diagnotic Utility", verMajor, verMinor, build);
+            Console.WriteLine("tapetool2 v{0}.{1}.{2} - Microbee/TRS-80/Sorcerer Tape Diagnotic Utility", verMajor, verMinor, build);
             Console.WriteLine("Copyright (C) 2017-2018 Topten Software.\n");
         }
 
@@ -130,7 +130,7 @@ namespace tapetool2
         static bool showFilterHelp;
         static List<string> _usingNamespaces = new List<string>();
 
-        static void ProcessArg(string arg)
+        static bool ProcessArg(string arg)
         {
             // Response file
             if (arg.StartsWith("@"))
@@ -148,14 +148,15 @@ namespace tapetool2
                 // Load the file
                 foreach (var a in args)
                 {
-                    ProcessArg(a);
+                    if (!ProcessArg(a))
+                        return false;
                 }
 
 
                 // Restore current directory
                 System.IO.Directory.SetCurrentDirectory(OldCurrentDir);
 
-                return;
+                return true;
             }
 
 
@@ -178,7 +179,7 @@ namespace tapetool2
                 if (lastStream != null)
                 {
                     if (SetArgument(nextToLastStream, lastStream, SwitchName, Value))
-                        return;
+                        return true;
                 }
 
                 // Other switches?
@@ -189,25 +190,26 @@ namespace tapetool2
                         if (lastStream != null)
                         {
                             showFilterHelp = true;
+                            return true;
                         }
                         else
                         {
                             ShowLogo();
                             ShowUsage();
+                            return false;
                         }
-                        return;
 
                     case "v":
                     case "version":
                         ShowLogo();
-                        return;
+                        return false;
                 }
 
                 if (FilterInfo.Namespaces.Contains(SwitchName, StringComparer.InvariantCultureIgnoreCase))
                 {
                     _usingNamespaces.Add(SwitchName);
                     _usingNamespaces.AddRange(FilterInfo.GetInheritedNamespaces(SwitchName));
-                    return;
+                    return true;
                 }
 
                 throw new InvalidOperationException(string.Format("Unknown or inapplicable switch: {0}", SwitchName));
@@ -253,6 +255,8 @@ namespace tapetool2
                 if (firstStream == null)
                     firstStream = lastStream;
             }
+
+            return true;
         }
 
         static int Main(string[] args)
@@ -266,7 +270,8 @@ namespace tapetool2
                 lastStream = null;
                 for (int i=0; i < args.Length; i++)
                 {
-                    ProcessArg(args[i]);
+                    if (!ProcessArg(args[i]))
+                        return 0;
                 }
 
                 // Show help for the first filter?

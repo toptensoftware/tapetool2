@@ -50,13 +50,13 @@ namespace tapetool2.Sorcerer
         }
 #endif
 
-        [StreamConverter(Namespace = "Exidy Sorcerer")]
+        [StreamConverter(Namespace = "sorcerer")]
         public static IHalfCycleKindStream ConvertAudioToHalfCycleKinds(IAudioStream audio)
         {
             return new AudioToHalfCycleKinds() { Input = audio };
         }
 
-        [StreamConverter(Namespace = "Exidy Sorcerer")]
+        [StreamConverter(Namespace = "sorcerer")]
         public static IBitStream ConvertAudioToBits(IAudioStream audio)
         {
             return new BytesToBits()
@@ -71,7 +71,7 @@ namespace tapetool2.Sorcerer
             };
         }
 
-        [StreamConverter(Namespace = "Exidy Sorcerer")]
+        [StreamConverter(Namespace = "sorcerer")]
         public static IAudioStream ConvertBitsToAudio(IBitStream from)
         {
             return new RenderAudio()
@@ -86,10 +86,22 @@ namespace tapetool2.Sorcerer
             };
         }
 
-        [StreamConverter(Namespace="Exidy Sorcerer")]
+        [StreamConverter(Namespace="sorcerer")]
         public static IAudioStream ConvertHalfCycleKindsToAudio(IHalfCycleKindStream cycles)
         {
             return new HalfCycleKindsToAudio() { Input = cycles };
+        }
+
+        [StreamConverter(Namespace = "sorcerer")]
+        public static MameBin.IMameStream ConvertBlocksToMameStream(IBlockStream stream)
+        {
+            return new BlocksToMame() { Input = stream };
+        }
+
+        [StreamConverter(Namespace = "sorcerer")]
+        public static IBlockStream ConvertMameStreamToBlocks(MameBin.IMameStream stream)
+        {
+            return new MameToBlocks() { Input = stream };
         }
     }
 }

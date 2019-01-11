@@ -138,8 +138,8 @@ public FilterAttribute Attributes
             if (contenders.Count == 1)
                 return contenders[0];
 
-            // TODO: resolve multiple
-            return null;
+            // Return the one with the longest matching extension
+            return contenders.OrderByDescending(x => x.Attributes.FileExtension.Length).First();
         }
 
         public static IStream CreateFileStream(string filename, IStream sourceStream, List<string> namespaces)

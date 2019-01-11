@@ -51,13 +51,14 @@ namespace tapetool2.MameBin
 
             // Work out the total length of this file
             var totalLength =
-                7                                  // initial header
-                + 4                                // some zeros
-                + _input.Header.ProgramName.Length // Program name
-                + 1                                // The 1A terminator
+                7                                   // initial header
+                + 4                                 // some zeros
+                + _input.Header.ProgramName.Length  // Program name
+                + 1                                 // The 1A terminator
                 + 3 * 2                             // The exec, load addre and load end addr.
+                + _input.Header.LoadLength          // The data
                 ;
-            AddUShort((ushort)totalLength);
+            AddUShort((ushort)(totalLength - 1));
 
             // Write the leading zeros
             headerBytes.AddRange(new byte[] { 0, 0, 0, 0 });
@@ -79,7 +80,7 @@ namespace tapetool2.MameBin
 
             // Sanity check
             System.Diagnostics.Debug.Assert(headerBytes.Count + _input.Header.LoadLength == totalLength);
-            _headerBytes = _headerBytes.ToArray();
+            _headerBytes = headerBytes.ToArray();
             _headerPos = -1;
             _dataPos = -1;
         }
@@ -101,24 +102,22 @@ namespace tapetool2.MameBin
             if (_headerPos < _headerBytes.Length)
             {
                 _headerPos++;
-                return true;
+                if (_headerPos < _headerBytes.Length)
+                    return true;
             }
 
             // Move to next data byte
             _dataPos++;
             bool ok = _input.Next();
 
+            if (_dataPos == _input.Header.LoadLength)
+            {
+                return false;
+            }
+
             // Check expected data length matches
-            if (_dataPos == _input.Header.LoadAddress)
-            {
-                if (ok)
-                    throw new InvalidOperationException("Internal error - MAME stream returned more data than header indicated");
-            }
-            else
-            {
-                if (!ok)
-                    throw new InvalidOperationException("MAME stream returned less data than header indicated");
-            }
+            if (!ok)
+                throw new InvalidOperationException("MAME stream returned less data than header indicated");
 
             return ok;
         }

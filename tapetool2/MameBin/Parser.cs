@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,16 +90,46 @@ namespace tapetool2.MameBin
             _header.ExecAddress = ReadUShort();
             _header.LoadAddress = ReadUShort();
             _header.LoadLength = (ushort)((ReadUShort() - _header.LoadAddress + 1) & 0xFFFF);
+            _dataBytesSent = 0;
+            _eofReached = true;
         }
+
+        int _dataBytesSent;
+        bool _eofReached;
 
         public byte GetByte()
         {
             return _input.GetByte();
         }
 
+        public override void WriteSummary(TextWriter w)
+        {
+            base.WriteSummary(w);
+            if (!_eofReached)
+            {
+                Console.WriteLine("\nWARNING: Extra data found at end of .mame.bin stream, ignored");
+            }
+        }
+
         protected override bool OnNext()
         {
-            return _input.Next();
+            if (_dataBytesSent == _header.LoadLength + 1)
+            {
+                bool retv = _input.Next();
+                _eofReached = !retv;
+                return false;
+            }
+
+            _dataBytesSent++;
+
+            if (_dataBytesSent > 1)
+            {
+                bool retv = _input.Next();
+                _eofReached = !retv;
+                return retv;
+            }
+            else
+                return true;
         }
     }
 }

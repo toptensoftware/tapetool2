@@ -108,6 +108,7 @@ namespace tapetool2
             }
             else
             {
+                _position++;
                 _eof = true;
                 return false;
             }

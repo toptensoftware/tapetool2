@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 namespace tapetool2.MameBin
 {
     [StreamKind("MAME quick load bin stream", "MAME quick load bin stream")]
-    interface IMameStream : IStream
+    interface IMameStream : Binary.IByteStream
     {
         MameHeader Header
         {
             get;
         }
-
-        byte GetByte();
     }
 }

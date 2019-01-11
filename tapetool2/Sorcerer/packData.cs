@@ -91,7 +91,10 @@ namespace tapetool2.Sorcerer
             _currentBlock = null;
 
             if (_blockAddress >= _header.datalen)
+            {
+                _input.Next();
                 return false;
+            }
 
             // How many bytes in this block
             var bytesInBlock = Math.Min((ushort)(_header.datalen - _blockAddress), (ushort)0x100);

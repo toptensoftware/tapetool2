@@ -56,6 +56,12 @@
     <Compile Include="Kansas\AudioToHalfCycleKinds.cs" />
     <Compile Include="Kansas\FormatSpec.cs" />
     <Compile Include="Kansas\BitsToBytes.cs" />
+    <Compile Include="MameBin\IMameStream.cs" />
+    <Compile Include="MameBin\MameHeader.cs" />
+    <Compile Include="MameBin\Formatter.cs" />
+    <Compile Include="MameBin\Parser.cs" />
+    <Compile Include="MameBin\Writer.cs" />
+    <Compile Include="MameBin\Reader.cs" />
     <Compile Include="Tape\CycleLengthsToCycleKinds.cs" />
     <Compile Include="Kansas\BitsToHalfCycleKinds.cs" />
     <Compile Include="Kansas\BaudSpec.cs" />

@@ -22,6 +22,9 @@ namespace tapetool2.Sorcerer
         int _stateByteIndex;
         byte[] _headerBytes;
 
+        const int leadInBytes = 101;
+        const int dataLeadInBytes = 101;
+
         enum State
         {
             bof,
@@ -56,7 +59,7 @@ namespace tapetool2.Sorcerer
             switch (_state)
             {
                 case State.leadIn:
-                    return (byte)(_stateByteIndex == 63 ? 0x01 : 0x00);
+                    return (byte)(_stateByteIndex == (leadInBytes - 1) ? 0x01 : 0x00);
 
                 case State.header:
                     return _headerBytes[_stateByteIndex];
@@ -65,7 +68,7 @@ namespace tapetool2.Sorcerer
                     return _input.Header.Checksum;
 
                 case State.dataLeadIn:
-                    return (byte)(_stateByteIndex == 63 ? 0x01 : 0x00);
+                    return (byte)(_stateByteIndex == (dataLeadInBytes - 1) ? 0x01 : 0x00);
 
                 case State.block:
                     return _input.GetBlock().Data[_stateByteIndex];
@@ -99,7 +102,7 @@ namespace tapetool2.Sorcerer
 
                 case State.leadIn:
                     _stateByteIndex++;
-                    if (_stateByteIndex == 64)
+                    if (_stateByteIndex == leadInBytes)
                     {
                         _state = State.header;
                         _stateByteIndex = 0;
@@ -124,7 +127,7 @@ namespace tapetool2.Sorcerer
 
                 case State.dataLeadIn:
                     _stateByteIndex++;
-                    if (_stateByteIndex == 64)
+                    if (_stateByteIndex == dataLeadInBytes)
                     {
                         _state = State.block;
                         _stateByteIndex = 0;

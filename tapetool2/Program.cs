@@ -10,7 +10,7 @@ namespace tapetool2
     class Program
     {
         const int verMajor = 1;
-        const int verMinor = 2;
+        const int verMinor = 3;
         const int build = 1200;
 
         static void ShowLogo()

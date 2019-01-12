@@ -40,6 +40,13 @@ namespace tapetool2.Sorcerer
 
         PackData _packer;
 
+        public override void Rewind()
+        {
+            base.Rewind();
+
+            _packer.DataLen = Input.Header.LoadLength;
+        }
+
         public Block GetBlock() => _packer.GetBlock();
     }
 }

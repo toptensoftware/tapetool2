@@ -10,7 +10,7 @@ using tapetool2.Binary;
 namespace tapetool2.Sorcerer
 {
     [Filter("sorcerer.packData", "Packs binary data into Exidy Sorcerer block format")]
-    class PackData: StreamBase, IBlockStream
+    class PackData : StreamBase, IBlockStream
     {
         public PackData()
         {
@@ -27,6 +27,12 @@ namespace tapetool2.Sorcerer
             set { _input = value; }
         }
 
+        public ushort DataLen
+        {
+            get => _header.datalen;
+            set => _header.datalen = value;
+        }
+
         public override void Rewind()
         {
             base.Rewind();
@@ -39,7 +45,7 @@ namespace tapetool2.Sorcerer
                 uint datalen = 0;
                 while (_input.Next())
                 {
-                    datalen++;                
+                    datalen++;
                 }
 
                 _input.Rewind();
@@ -47,14 +53,15 @@ namespace tapetool2.Sorcerer
                 if (datalen > 0xFFFF)
                     throw new InvalidOperationException("Input data is too long");
 
-                // Setup header
-                _header.filename = "NONAME";
                 _header.datalen = (ushort)datalen;
-                _header.loadaddr = 0x0400;
-                _header.startaddr = 0x0400;
-                _header.fileid = (char)0x55;
-                _header.filetype = (char)0x00;
             }
+
+            // Setup header
+            _header.filename = "NONAME";
+            _header.loadaddr = 0x0400;
+            _header.startaddr = 0x0400;
+            _header.fileid = (char)0x55;
+            _header.filetype = (char)0x00;
 
             _blockAddress = 0;
         }

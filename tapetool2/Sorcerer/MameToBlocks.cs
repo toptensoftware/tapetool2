@@ -7,37 +7,39 @@ using tapetool2.MameBin;
 
 namespace tapetool2.Sorcerer
 {
-    [Filter("sorcerer.blocksToMame", "Converts a Sorcerer Block Stream to MAME quickload bin format")]
-    class BlocksToMame : CompositeStream, MameBin.IMameStream
+    [Filter("sorcerer.mameToBlocks", "Converts MAME quickload bin format to a Sorcerer Block Stream")]
+    class MameToBlocks : CompositeStream, IBlockStream
     {
-        public BlocksToMame()
+        public MameToBlocks()
         {
-            Add(_unpacker = new UnpackData());
+            Add(_packer = new PackData());
         }
 
         [InputStream]
-        public IBlockStream Input
+        public IMameStream Input
         {
-            get { return _unpacker.Input; }
-            set { _unpacker.Input = value; }
+            get { return _packer.Input as IMameStream; }
+            set { _packer.Input = value; }
         }
 
-        public MameHeader Header
+        TapeHeader IBlockStream.Header
         {
             get
             {
-                return new MameHeader()
+                return new TapeHeader()
                 {
-                    ProgramName = _unpacker.Input.Header.filename.Trim(),
-                    LoadAddress = _unpacker.Input.Header.loadaddr,
-                    LoadLength = _unpacker.Input.Header.datalen,
-                    ExecAddress = _unpacker.Input.Header.startaddr,
+                    fileid = (char)0x55,
+                    filetype = (char)0x4C,
+                    filename = Input.Header.ProgramName,
+                    loadaddr = Input.Header.LoadAddress,
+                    datalen = Input.Header.LoadLength,
+                    startaddr = Input.Header.ExecAddress,
                 };
             }
         }
 
-        UnpackData _unpacker;
+        PackData _packer;
 
-        public byte GetByte() => _unpacker.GetByte();
+        public Block GetBlock() => _packer.GetBlock();
     }
 }

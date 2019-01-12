@@ -62,8 +62,8 @@
     <Compile Include="MameBin\Parser.cs" />
     <Compile Include="MameBin\Writer.cs" />
     <Compile Include="MameBin\Reader.cs" />
-    <Compile Include="Sorcerer\MameToBlocks.cs" />
     <Compile Include="Sorcerer\BlocksToMame.cs" />
+    <Compile Include="Sorcerer\MameToBlocks.cs" />
     <Compile Include="Tape\CycleLengthsToCycleKinds.cs" />
     <Compile Include="Kansas\BitsToHalfCycleKinds.cs" />
     <Compile Include="Kansas\BaudSpec.cs" />

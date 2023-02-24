@@ -11,7 +11,7 @@ namespace tapetool2
     {
         const int verMajor = 1;
         const int verMinor = 4;
-        const int build = 1403;
+        const int build = 1404;
 
         static void ShowLogo()
         {

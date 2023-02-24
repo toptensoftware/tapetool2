@@ -43,11 +43,17 @@ namespace tapetool2.Audio
             set { _bitsPerSample = value; }
         }
 
+        int ResolvedBitsPerSample
+        {
+            get => _bitsPerSample == 0 ? _input.BitsPerSample : _bitsPerSample;
+        }
+
         void WriteHeader()
         {
-            if (_bitsPerSample != 8 && _bitsPerSample != 16 && _bitsPerSample != 32)
+            var bps = ResolvedBitsPerSample;
+            if (bps != 8 && bps != 16 && bps != 32)
             {
-                throw new InvalidOperationException(string.Format("Unsupported sample width on wave writer: {0} bits", _bitsPerSample));
+                throw new InvalidOperationException(string.Format("Unsupported sample width on wave writer: {0} bits", bps));
             }
 
             // RIFF header
@@ -55,7 +61,7 @@ namespace tapetool2.Audio
             _binaryWriter.Write((uint)0);                   // Fill in later
             _binaryWriter.Write(WaveUtils.RiffTypeWave);
 
-            int bytesPerSample = _bitsPerSample / 8;
+            int bytesPerSample = bps / 8;
 
             // Format Chunk
             _binaryWriter.Write((uint)(WaveUtils.ChunkIdFmt));
@@ -97,10 +103,6 @@ namespace tapetool2.Audio
             // Open output stream
             _stream = File.Create(Filename);
             _binaryWriter = new BinaryWriter(_stream, Encoding.UTF8, true);
-            _bitsPerSample = _input.BitsPerSample;
-
-            if (_bitsPerSample < 8)
-                _bitsPerSample = 8;
 
             WriteHeader();
         }
@@ -123,7 +125,7 @@ namespace tapetool2.Audio
         {
             get
             {
-                return _bitsPerSample;
+                return ResolvedBitsPerSample;
             }
         }
 
@@ -152,7 +154,7 @@ namespace tapetool2.Audio
                     sample = -1;
                 else if (sample > 1)
                     sample = 1;
-                switch (_bitsPerSample)
+                switch (ResolvedBitsPerSample)
                 {
                     case 8:
                     {
@@ -209,7 +211,7 @@ namespace tapetool2.Audio
             w.WriteLine("    total samples: {0}", _totalSamples);
             w.WriteLine("    sample rate: {0}Hz", _input.SampleRate);
             w.WriteLine("    channels: {0}", _input.ChannelCount);
-            w.WriteLine("    bits per sample: {0}", _bitsPerSample);
+            w.WriteLine("    bits per sample: {0}", ResolvedBitsPerSample);
         }
     }
 }
